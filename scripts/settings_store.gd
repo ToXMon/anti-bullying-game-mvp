@@ -15,7 +15,7 @@ func load_settings() -> void:
 		return
 
 	reduced_motion = bool(config.get_value("accessibility", "reduced_motion", false))
-	# Analytics must stay off by default and only stores this local setting if changed.
+	# Analytics remains disabled by default; no analytics collection is implemented.
 	analytics_enabled = bool(config.get_value("privacy", "analytics_enabled", false))
 
 func save_settings() -> void:

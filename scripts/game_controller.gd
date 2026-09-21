@@ -240,8 +240,8 @@ func _render_ending() -> void:
 	lines.append(band.get("summary", "You practiced safe choices."))
 	lines.append("")
 	lines.append("Your route:")
-	for i in range(game_state.choices.size()):
-		var choice: Dictionary = game_state.choices[i]
+	for choice_data in game_state.choices:
+		var choice: Dictionary = choice_data
 		if choice.get("approach", "story") == "story":
 			continue
 		lines.append("• %s — %s" % [choice.get("approach", "choice"), choice.get("label", "")])

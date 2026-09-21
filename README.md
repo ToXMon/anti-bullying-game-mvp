@@ -9,7 +9,7 @@
 - Replay from the ending or the header.
 - Clear trusted-adult path available from both choices and the help button.
 - No combat, graphic imagery, public chat, ads, accounts, tracking, therapy claims, diagnostic claims, or child-submitted personal stories.
-- No personal data is stored. Analytics are off by default; the only local persistence is the reduced-motion/accessibility toggle in `user://settings.cfg`.
+- No personal data is stored. Analytics are off by default; local persistence is limited to accessibility/privacy settings in `user://settings.cfg` (reduced motion is the only user-facing toggle).
 
 ## Setup
 
@@ -36,7 +36,7 @@ The project is resilient to missing optional art: if `res://assets/hallway_helpe
 Content, state, presentation, and persistence are intentionally separated:
 
 - `data/scenarios/hallway_helpers.json` — data-driven scenario content, choice effects, consequence text, and ending bands.
-- `scripts/content_repository.gd` — loads scenario content and handles missing/invalid data gracefully.
+- `scripts/content_repository.gd` — loads scenario content and handles missing or non-object JSON gracefully.
 - `scripts/game_state.gd` — in-memory route and score state; no personal data or route history is saved.
 - `scripts/settings_store.gd` — local accessibility/privacy settings only; analytics remains off by default.
 - `scripts/game_controller.gd` — UI presentation, keyboard/touch controls, replay, optional asset handling, and trusted-adult help.
@@ -83,6 +83,6 @@ Use this checklist before a school pilot or moderated parent test:
 
 ## Licensing
 
-- Code in this repository is offered under the MIT License unless a future `LICENSE` file states otherwise.
+- Code in this repository is offered under the MIT License; see `LICENSE` for the terms.
 - Scenario text and the included SVG icon are original project content for this MVP. Treat them as CC BY 4.0 unless a future content license states otherwise.
 - No third-party art, music, fonts, accounts, analytics SDKs, or network services are included.
