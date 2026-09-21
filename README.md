@@ -46,7 +46,8 @@ Use the manual checklist in [`docs/browser-smoke-test.md`](docs/browser-smoke-te
 - `src/content/scenario.ts` — scenario content data: scenes, choices, reflection prompts, and trusted-adult notes.
 - `src/domain/` — pure TypeScript state machine, validation, and scenario tests.
 - `src/ui/accessibilityOverlay.ts` — semantic DOM accessibility overlay with buttons, screen-reader labels, focus management, and large touch targets.
-- `src/game/GameScene.ts` — Phaser presentation layer for calm visual context and graceful missing-asset fallback art.
+- `src/game/GameScene.ts` — Phaser presentation layer for the procedural layered courtyard, character avatars, atmospheric lighting, responsive chapter framing, and reduced-motion transitions.
+- `src/game/presentationState.ts` — pure mapping from scenario snapshots to visual mood, chapter progress, and accessible presentation labels.
 - `src/persistence/settingsStore.ts` — local settings persistence for reduced motion only; no progress, names, stories, or personal data are saved.
 - `src/main.ts` — composition root connecting content, state, persistence, DOM UI, and Phaser.
 
@@ -64,6 +65,12 @@ The MVP is designed for ages 8-12 and includes:
 - clear trusted-adult escalation and replay.
 
 It intentionally excludes combat, graphic bullying imagery, public chat, ads, accounts, tracking, analytics, therapy claims, diagnostic claims, child-submitted personal stories, secrets, network services, and backend requirements.
+
+## Performance and provenance
+
+The visual layer intentionally uses original Phaser `Graphics` primitives rather than downloaded art, fonts, WebGL frameworks, or runtime network requests. The small `public/favicon.svg` is also original project SVG artwork; no third-party art is bundled. This keeps asset provenance clear and static hosting simple, while avoiding image decode and download cost on mid-range phones. Phaser remains the only rendering framework; the layered plates, soft glows, perspective lines, and friendly avatars are small procedural drawings redrawn on resize and scene changes. The production bundle is currently Phaser-dominated (about 330 kB gzip); Vite reports this as a chunk-size warning, but splitting Phaser would add complexity without reducing the first interactive download for this single-scene MVP.
+
+The browser shell uses semantic HTML buttons as the source of truth for keyboard, touch, and screen-reader interaction. The canvas is decorative presentation and the DOM overlay mirrors the active scene, including reduced-motion controls and replay.
 
 ## Static deployment
 

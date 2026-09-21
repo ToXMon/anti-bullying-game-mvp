@@ -24,28 +24,33 @@ export class AccessibilityOverlay {
       .join('');
     const choiceButtons = scene.choices
       .map(
-        (choice) => `
-          <button class="choice-button" type="button" data-choice-id="${escapeHtml(choice.id)}" aria-label="${escapeHtml(
-            `${choice.label} ${choice.description}`,
-          )}">
-            <span>${escapeHtml(choice.label)}</span><br />
-            <span class="small-note">${escapeHtml(choice.description)}</span>
+        (choice, index) => `
+          <button class="choice-button" type="button" data-choice-id="${escapeHtml(choice.id)}">
+            <span class="choice-index" aria-hidden="true">${index + 1}</span>
+            <span class="choice-copy">
+              <span class="choice-label">${escapeHtml(choice.label)}</span>
+              <span class="small-note">${escapeHtml(choice.description)}</span>
+            </span>
           </button>`,
       )
       .join('');
 
     this.root.innerHTML = `
       <article class="a11y-card" aria-labelledby="scene-title">
-        <p class="kicker">${isEnding ? 'Reflection ending' : 'No time pressure · Choose when ready'}</p>
-        <div>
+        <p class="kicker">${isEnding ? 'Reflection ending · replay anytime' : 'No time pressure · choose when ready'}</p>
+        <header class="scene-heading">
           <h1 id="scene-title" tabindex="-1">${escapeHtml(scene.title)}</h1>
-          <p class="small-note">${escapeHtml(scene.location)} · ${escapeHtml(snapshot.scenarioId)}</p>
-        </div>
+          <p class="scene-meta">
+            <span class="meta-chip">${escapeHtml(scene.location)}</span>
+            <span aria-hidden="true">·</span>
+            <span>${escapeHtml(snapshot.scenarioId)}</span>
+          </p>
+        </header>
         <div class="scene-text">
           <p>${escapeHtml(scene.body)}</p>
           ${scene.adultHelp ? `<p><strong>Trusted-adult note:</strong> ${escapeHtml(scene.adultHelp)}</p>` : ''}
         </div>
-        ${this.lastConsequence ? `<p role="status"><strong>What happened:</strong> ${escapeHtml(this.lastConsequence)}</p>` : ''}
+        ${this.lastConsequence ? `<p class="consequence" role="status"><strong>What happened:</strong> ${escapeHtml(this.lastConsequence)}</p>` : ''}
         <section aria-labelledby="prompt-title">
           <h2 id="prompt-title">${escapeHtml(scene.prompt)}</h2>
           ${scene.reflection ? `<p class="prompt">${escapeHtml(scene.reflection)}</p>` : ''}
@@ -54,9 +59,9 @@ export class AccessibilityOverlay {
         ${historyItems ? `<section aria-labelledby="progress-title"><h3 id="progress-title">Your path</h3><ol class="progress-list">${historyItems}</ol></section>` : ''}
         <div class="utility-row" aria-label="Game controls">
           <button type="button" data-action="reset">${isEnding ? 'Replay from the beginning' : 'Reset safely'}</button>
-          <button type="button" data-action="motion">${this.settings.reducedMotion ? 'Use standard motion' : 'Reduce motion'}</button>
+          <button type="button" data-action="motion" aria-pressed="${this.settings.reducedMotion}">${this.settings.reducedMotion ? 'Use standard motion' : 'Reduce motion'}</button>
         </div>
-        <p class="small-note">No names, stories, accounts, analytics, or network services are collected by this game.</p>
+        <p class="privacy-note"><span class="privacy-mark" aria-hidden="true">●</span><span>No names, stories, accounts, analytics, or network services are collected by this game.</span></p>
       </article>
     `;
 
