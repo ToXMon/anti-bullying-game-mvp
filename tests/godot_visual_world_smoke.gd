@@ -6,9 +6,9 @@ func _init() -> void:
 	call_deferred("_run")
 
 func _run() -> void:
-	var world_script: Script = load("res://scripts/cinematic_hallway_world.gd")
+	var world_script: Script = load("res://scripts/playful_school_world.gd")
 	if world_script == null:
-		_fail("cinematic hallway script could not be loaded")
+		_fail("playful school world script could not be loaded")
 		_finish()
 		return
 
@@ -26,7 +26,7 @@ func _run() -> void:
 		"ending",
 	]
 	for context in contexts:
-		world.set_context(context, {}, true, "cinematic")
+		world.set_context(context, {}, true, "playful")
 		await process_frame
 		_expect(world.get_chapter_title() != "", "chapter title exists for %s" % context)
 		_expect(world.get_caption_text() != "", "caption exists for %s" % context)
@@ -44,7 +44,7 @@ func _fail(message: String) -> void:
 
 func _finish() -> void:
 	if failures.is_empty():
-		print("Visual world smoke passed: procedural 3D chapters and low-detail mode instantiate.")
+		print("Visual world smoke passed: procedural 3D daytime chapters and low-detail mode instantiate.")
 		quit(0)
 	else:
 		printerr("Visual world smoke failed: %s" % ", ".join(failures))

@@ -5,7 +5,7 @@ const GameStateScript := preload("res://scripts/game_state.gd")
 const SettingsStoreScript := preload("res://scripts/settings_store.gd")
 const StorybookBackdropScript := preload("res://scripts/storybook_backdrop.gd")
 const HallwayIllustrationScript := preload("res://scripts/hallway_illustration.gd")
-const CinematicHallwayWorldScript := preload("res://scripts/cinematic_hallway_world.gd")
+const PlayfulSchoolWorldScript := preload("res://scripts/playful_school_world.gd")
 
 const INK := Color("#10202f")
 const MUTED_INK := Color("#4e5f68")
@@ -29,7 +29,7 @@ var story_card: PanelContainer
 var feedback_card: PanelContainer
 var choices_card: PanelContainer
 var hallway_art: Control
-var cinematic_world
+var school_world
 var illustration: TextureRect
 var illustration_caption: Label
 var title_label: Label
@@ -127,7 +127,7 @@ func _build_ui() -> void:
 	motion_button.pressed.connect(_toggle_reduced_motion)
 	header.add_child(motion_button)
 
-	quality_button = _make_small_button("3D detail: Full")
+	quality_button = _make_small_button("World detail: Full")
 	quality_button.pressed.connect(_toggle_visual_quality)
 	header.add_child(quality_button)
 
@@ -164,10 +164,10 @@ func _build_ui() -> void:
 	chapter_strip.add_child(safety_label)
 
 	if _can_use_3d_presentation():
-		cinematic_world = CinematicHallwayWorldScript.new()
-		cinematic_world.custom_minimum_size = Vector2(0, 240)
-		cinematic_world.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		scene_stack.add_child(cinematic_world)
+		school_world = PlayfulSchoolWorldScript.new()
+		school_world.custom_minimum_size = Vector2(0, 240)
+		school_world.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		scene_stack.add_child(school_world)
 
 	hallway_art = HallwayIllustrationScript.new()
 	hallway_art.custom_minimum_size = Vector2(0, 200)
@@ -182,7 +182,7 @@ func _build_ui() -> void:
 	scene_stack.add_child(illustration)
 
 	illustration_caption = Label.new()
-	illustration_caption.text = "A calm illustrated hallway with a visible trusted-adult doorway."
+	illustration_caption.text = "A sunny school commons with classroom, lunch, recess, and trusted-adult landmarks."
 	illustration_caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	illustration_caption.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	illustration_caption.add_theme_font_size_override("font_size", 17)
@@ -345,19 +345,19 @@ func _load_optional_illustration(path: String) -> void:
 	if has_optional_illustration:
 		illustration.texture = load(path)
 		illustration.visible = true
-		if cinematic_world != null:
-			cinematic_world.visible = false
+		if school_world != null:
+			school_world.visible = false
 		hallway_art.visible = false
 		illustration_caption.text = "Project-local illustration loaded. The trusted-adult path remains available."
-	elif cinematic_world != null:
+	elif school_world != null:
 		illustration.visible = false
-		cinematic_world.visible = true
+		school_world.visible = true
 		hallway_art.visible = false
-		illustration_caption.text = "Original procedural 3D hallway art uses project-authored Godot meshes and no external assets."
+		illustration_caption.text = "Original procedural 3D school world uses project-authored Godot meshes and no external assets."
 	else:
 		illustration.visible = false
-		if cinematic_world != null:
-			cinematic_world.visible = false
+		if school_world != null:
+			school_world.visible = false
 		hallway_art.visible = true
 		illustration_caption.text = "Original procedural 2D hallway fallback keeps the scene readable when 3D rendering is unavailable."
 	_sync_visual_controls()
@@ -368,21 +368,21 @@ func _can_use_3d_presentation() -> bool:
 func _sync_visual_controls() -> void:
 	if quality_button == null:
 		return
-	if cinematic_world == null or not cinematic_world.visible:
+	if school_world == null or not school_world.visible:
 		quality_button.text = "Visuals: 2D fallback"
 		quality_button.disabled = true
 		return
 	quality_button.disabled = false
-	quality_button.text = "3D detail: %s" % ["Low" if settings.visual_quality == "calm" else "Full"]
+	quality_button.text = "World detail: %s" % ["Low" if settings.visual_quality == "calm" else "Full"]
 
 func _update_scene_presentation() -> void:
 	var fallback_title: String = _fallback_chapter_title()
 	chapter_label.text = fallback_title
 	safety_label.text = "Private practice • no public scores"
-	if cinematic_world != null and cinematic_world.visible:
-		cinematic_world.set_context(game_state.current_node_id, active_node, settings.reduced_motion, settings.visual_quality)
-		chapter_label.text = cinematic_world.get_chapter_title()
-		illustration_caption.text = cinematic_world.get_caption_text()
+	if school_world != null and school_world.visible:
+		school_world.set_context(game_state.current_node_id, active_node, settings.reduced_motion, settings.visual_quality)
+		chapter_label.text = school_world.get_chapter_title()
+		illustration_caption.text = school_world.get_caption_text()
 	elif hallway_art != null and hallway_art.visible:
 		illustration_caption.text = "Original procedural 2D hallway fallback keeps the scene readable when 3D rendering is unavailable."
 
@@ -537,7 +537,7 @@ func _toggle_reduced_motion() -> void:
 	_update_scene_presentation()
 
 func _toggle_visual_quality() -> void:
-	settings.visual_quality = "calm" if settings.visual_quality != "calm" else "cinematic"
+	settings.visual_quality = "calm" if settings.visual_quality != "calm" else "playful"
 	settings.save_settings()
 	_sync_visual_controls()
 	_update_scene_presentation()

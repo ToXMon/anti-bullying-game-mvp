@@ -5,7 +5,7 @@ This file is the project's committed home for project-intrinsic agent knowledge:
 - Godot 4.x project entry point is `project.godot` -> `scenes/main.tscn`.
 - Scenario content is data-driven in `data/scenarios/hallway_helpers.json`; keep content separate from state/presentation scripts under `scripts/`.
 - Run `python3 -m unittest discover -s tests` for contract tests. If Godot is installed, also smoke-check with `godot4 --headless --path . --quit-after 1`, `godot4 --headless --path . --script tests/godot_visual_world_smoke.gd`, and `godot4 --headless --path . --script tests/godot_interactive_smoke.gd` (or `godot` instead of `godot4`).
-- Procedural 3D presentation lives in `scripts/cinematic_hallway_world.gd`; keep 3D, fallback, asset provenance, and performance notes aligned with `README.md`.
+- Procedural 3D presentation lives in `scripts/playful_school_world.gd`; keep 3D, fallback, asset provenance, and performance notes aligned with `README.md`.
 
 ## Maintaining this file
 

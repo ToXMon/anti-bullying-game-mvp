@@ -4,7 +4,7 @@ class_name SettingsStore
 const SETTINGS_PATH := "user://settings.cfg"
 
 var reduced_motion := false
-var visual_quality := "cinematic"
+var visual_quality := "playful"
 var analytics_enabled := false
 
 func load_settings() -> void:
@@ -16,9 +16,9 @@ func load_settings() -> void:
 		return
 
 	reduced_motion = bool(config.get_value("accessibility", "reduced_motion", false))
-	visual_quality = str(config.get_value("accessibility", "visual_quality", "cinematic"))
+	visual_quality = str(config.get_value("accessibility", "visual_quality", "playful"))
 	if visual_quality != "calm":
-		visual_quality = "cinematic"
+		visual_quality = "playful"
 	# Analytics remains disabled by default; no analytics collection is implemented.
 	analytics_enabled = bool(config.get_value("privacy", "analytics_enabled", false))
 

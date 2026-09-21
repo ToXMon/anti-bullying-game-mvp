@@ -30,7 +30,7 @@ The project is resilient to missing optional art or 3D rendering: if `res://asse
 - `R`: replay from the beginning.
 - `A`: open the trusted-adult help dialog.
 - Reduced motion: toggle from the header. There is no time pressure.
-- 3D detail: toggle from the header between full cinematic detail and low-detail calm mode.
+- World detail: toggle from the header between full playful scene detail and low-detail calm mode.
 
 ## Architecture
 
@@ -41,18 +41,22 @@ Content, state, presentation, and persistence are intentionally separated:
 - `scripts/game_state.gd` — in-memory route and score state; no personal data or route history is saved.
 - `scripts/settings_store.gd` — local accessibility/privacy settings only; analytics remains off by default.
 - `scripts/game_controller.gd` — UI presentation, keyboard/touch controls, replay, optional asset handling, and trusted-adult help.
-- `scripts/cinematic_hallway_world.gd` — original procedural 3D hallway presentation, chapter camera framing, lighting, fog, quality toggle, and 2D/headless fallback coordination.
+- `scripts/playful_school_world.gd` — original procedural 3D school-world presentation, chapter camera framing, soft daylight, quality toggle, trusted-adult route cues, and 2D/headless fallback coordination.
 - `scenes/main.tscn` — Godot entry scene.
 - `tests/test_scenario_contract.py` — focused automated checks for the scenario contract and reachable endings.
 - `tests/test_visual_contract.py` — focused automated checks for procedural visual provenance, fallback, accessibility controls, and chapter presentation.
 - `tests/godot_interactive_smoke.gd` — headless Godot smoke path that simulates keyboard choices through an adult-support route, ending, reduced-motion toggle, and replay.
-- `tests/godot_visual_world_smoke.gd` — headless Godot smoke path that instantiates the procedural 3D world, chapter contexts, and low-detail mode.
+- `tests/godot_visual_world_smoke.gd` — headless Godot smoke path that instantiates the procedural daytime 3D world, chapter contexts, and low-detail mode.
 
 ## Visual provenance and performance
 
-This visual pass uses original project-authored procedural Godot meshes, materials, lights, and UI styles. The Kage and ThreeUI repositories were used only as reference studies for cinematic camera language, layered depth, restrained atmosphere, chapter framing, component hierarchy, spacing, and stateful controls; no code, artwork, branding, assets, or text from those projects is copied. No third-party art, textures, fonts, GLB files, analytics SDKs, or network services are included.
+This visual pass uses original project-authored procedural Godot meshes, materials, lights, and UI styles. The Kage and ThreeUI repositories were used only as reference studies for composition, readable depth, chapter framing, component hierarchy, spacing, and stateful controls; no code, artwork, branding, assets, or text from those projects is copied. No third-party art, textures, fonts, GLB files, analytics SDKs, or network services are included.
 
-The 3D scene keeps runtime practical by using simple primitive meshes, one active chapter prop set at a time, three lights, no physics, no particles, and no binary assets. Full detail is roughly under 95 active mesh draws on the busiest chapter; **3D detail: Low** hides decorative haze/light patches, lowers 3D render scale, and disables MSAA. New asset payload is script text only; added binary asset size is 0 bytes.
+The 3D scene keeps runtime practical by using simple primitive meshes, one active chapter prop set at a time, three lights, no physics, no particles, and no binary assets. Full detail is roughly under 110 active mesh draws on the busiest chapter; **World detail: Low** hides extra playful props and skylight panels, lowers 3D render scale, and disables MSAA. New asset payload is script text only; added binary asset size is 0 bytes.
+
+## Visual revision rationale
+
+Before: the branch leaned on dramatic depth treatment and film-style wording that did not fit a warm practice space for ages 8-12. After: the world is a daytime school commons with classroom, lunch, recess, and trusted-adult landmarks, toy-like avatars, playful props, and safe route tiles that make adult help visible without pressure.
 
 ## Automated tests
 
@@ -75,13 +79,13 @@ godot4 --headless --path . --script tests/godot_interactive_smoke.gd
 Use this checklist before a school pilot or moderated parent test:
 
 1. Launch the project in Godot 4.x and confirm the title screen text appears.
-2. Confirm the cinematic procedural 3D hallway appears when no optional illustration asset exists, or the procedural 2D fallback appears when 3D is unavailable.
+2. Confirm the bright procedural 3D school world appears when no optional illustration asset exists, or the procedural 2D fallback appears when 3D is unavailable.
 3. Play one route using only touch/mouse; verify all buttons are large and readable.
 4. Replay and play one route using number keys `1`-`4`.
 5. Choose at least one **trusted adult** option and confirm the progress line changes to "adult path tried".
 6. Open the **Trusted adult help** dialog with the button and with `A`.
 7. Toggle **Reduced motion** and verify choices still work without time pressure.
-8. Toggle **3D detail** and verify the lower-detail mode keeps the same text, choices, and trusted-adult path.
+8. Toggle **World detail** and verify the lower-detail mode keeps the same text, choices, and trusted-adult path.
 9. Try a route with **do nothing** choices and confirm feedback is non-shaming and invites replay.
 10. Reach the ending card; confirm it includes a route summary, reflection prompt, and replay button.
 11. Close and relaunch; confirm no route history, names, chat, or child story text was stored.
