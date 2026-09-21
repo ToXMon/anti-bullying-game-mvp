@@ -21,7 +21,7 @@
    Some systems install the binary as `godot` instead of `godot4`.
 3. Press **Play**. The main scene is `res://scenes/main.tscn`.
 
-The project is resilient to missing optional art: if `res://assets/hallway_helpers.png` is absent, the game runs in text-only mode and shows a friendly notice.
+The project is resilient to missing optional art: if `res://assets/hallway_helpers.png` is absent, the game uses an original procedural storybook hallway drawn with Godot controls and draw calls.
 
 ## Controls
 
@@ -62,7 +62,7 @@ godot4 --headless --path . --quit-after 1
 Use this checklist before a school pilot or moderated parent test:
 
 1. Launch the project in Godot 4.x and confirm the title screen text appears.
-2. Confirm the optional-art notice appears when no illustration asset exists.
+2. Confirm the procedural storybook hallway appears when no optional illustration asset exists.
 3. Play one route using only touch/mouse; verify all buttons are large and readable.
 4. Replay and play one route using number keys `1`-`4`.
 5. Choose at least one **trusted adult** option and confirm the progress line changes to "adult path tried".
