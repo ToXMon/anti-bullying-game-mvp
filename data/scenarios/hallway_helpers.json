@@ -1,0 +1,314 @@
+{
+  "schema_version": 1,
+  "id": "hallway_helpers",
+  "title": "Kindness Crew: Hallway Helpers",
+  "age_range": "8-12",
+  "estimated_minutes": "8-12",
+  "safety_note": "Practice safe bystander choices in a fictional school day. If something like this happens in real life, talk with a trusted adult.",
+  "optional_illustration": "res://assets/hallway_helpers.png",
+  "start_node": "intro",
+  "no_personal_data": true,
+  "analytics_default": "off",
+  "nodes": {
+    "intro": {
+      "type": "story",
+      "speaker": "Narrator",
+      "text": "It is club sign-up day at Maple Commons. Your class is making posters for the after-school showcase. Mina brings a bright robot poster she worked on all week.",
+      "choices": [
+        {
+          "id": "begin",
+          "label": "Start the school day",
+          "next": "hallway_first"
+        }
+      ]
+    },
+    "hallway_first": {
+      "type": "decision",
+      "decision_number": 1,
+      "speaker": "Narrator",
+      "text": "In the hallway, Joss blocks the bulletin board and says, 'Robots are for show-offs.' Mina looks down and folds one corner of the poster. A few students are watching.",
+      "prompt": "What can you safely do first?",
+      "choices": [
+        {
+          "id": "redirect",
+          "label": "Use a safe redirection",
+          "approach": "safe redirection",
+          "next": "redirect_result",
+          "consequence": "You do not argue or insult Joss. You point to the sign-up table and say the teacher needs help sorting markers. The crowd's attention shifts away from Mina.",
+          "reflection": "Redirection can lower pressure when it is calm, brief, and safe.",
+          "effects": {"mina_trust": 1, "scene_pressure": -1, "adult_loop": 0, "crew_energy": 1}
+        },
+        {
+          "id": "private_support",
+          "label": "Check on Mina privately",
+          "approach": "private support",
+          "next": "private_support_result",
+          "consequence": "You walk with Mina toward the water fountain and ask if she wants company. She nods. The teasing pauses because there is no audience.",
+          "reflection": "Private support helps someone feel less alone without putting them on the spot.",
+          "effects": {"mina_trust": 2, "scene_pressure": 0, "adult_loop": 0, "crew_energy": 1}
+        },
+        {
+          "id": "trusted_adult",
+          "label": "Get a trusted adult",
+          "approach": "trusted adult",
+          "next": "adult_result",
+          "consequence": "You tell Mr. Chen, the club advisor, exactly what you saw. He walks over calmly and makes space at the board for everyone.",
+          "reflection": "Getting a trusted adult is a strong choice when someone is being targeted or you feel unsure.",
+          "effects": {"mina_trust": 1, "scene_pressure": -2, "adult_loop": 2, "crew_energy": 0}
+        },
+        {
+          "id": "do_nothing",
+          "label": "Do nothing for now",
+          "approach": "do nothing",
+          "next": "nothing_result",
+          "consequence": "You stay quiet. The moment passes, but Mina keeps her poster rolled up and Joss keeps the best board space.",
+          "reflection": "Doing nothing may feel easier, but it can leave the person targeted without support. You can still choose differently next time.",
+          "effects": {"mina_trust": -1, "scene_pressure": 1, "adult_loop": 0, "crew_energy": 0}
+        }
+      ]
+    },
+    "redirect_result": {
+      "type": "story",
+      "speaker": "Narrator",
+      "text": "At the marker table, Joss starts bragging about a sports poster instead. Mina unrolls her robot drawing again, but she still watches the hallway carefully.",
+      "choices": [{"id": "continue", "label": "Continue", "next": "lunch_followup"}]
+    },
+    "private_support_result": {
+      "type": "story",
+      "speaker": "Mina",
+      "text": "'Thanks for walking with me,' Mina says. 'I don't want a huge scene. I just want to put my poster up.'",
+      "choices": [{"id": "continue", "label": "Continue", "next": "lunch_followup"}]
+    },
+    "adult_result": {
+      "type": "story",
+      "speaker": "Mr. Chen",
+      "text": "'Everyone gets a fair spot,' Mr. Chen says. He does not call anyone names. He reminds the group that clubs are for trying things, not judging people.",
+      "choices": [{"id": "continue", "label": "Continue", "next": "lunch_followup"}]
+    },
+    "nothing_result": {
+      "type": "story",
+      "speaker": "Narrator",
+      "text": "The bell rings. Mina tucks the poster under her arm. You notice she chooses a quiet table at lunch instead of sitting near the club display.",
+      "choices": [{"id": "continue", "label": "Continue", "next": "lunch_followup"}]
+    },
+    "lunch_followup": {
+      "type": "decision",
+      "decision_number": 2,
+      "speaker": "Narrator",
+      "text": "At lunch, two classmates repeat the robot joke. Mina is close enough to hear. The lunchroom is busy, and an aide is near the doors.",
+      "prompt": "Which bystander move fits this moment?",
+      "choices": [
+        {
+          "id": "invite_group",
+          "label": "Invite Mina into a shared task",
+          "approach": "safe redirection",
+          "next": "invite_result",
+          "consequence": "You ask Mina to help choose sticker labels for the showcase table. The conversation changes to colors and jobs, and two students join in.",
+          "reflection": "A friendly invitation can redirect the group while giving the targeted person a real choice.",
+          "effects": {"mina_trust": 1, "scene_pressure": -1, "adult_loop": 0, "crew_energy": 1}
+        },
+        {
+          "id": "ask_wants_adult",
+          "label": "Ask Mina if she wants adult help",
+          "approach": "private support",
+          "next": "ask_adult_result",
+          "consequence": "You quietly ask Mina what would help. She says she wants the lunch aide to know before the showcase gets crowded.",
+          "reflection": "Private support can include asking what kind of help the person wants, then respecting that answer.",
+          "effects": {"mina_trust": 2, "scene_pressure": -1, "adult_loop": 1, "crew_energy": 0}
+        },
+        {
+          "id": "report_lunch",
+          "label": "Tell the lunch aide what happened",
+          "approach": "trusted adult",
+          "next": "lunch_aide_result",
+          "consequence": "The aide thanks you for being specific. She checks on Mina privately and keeps an eye on the table without making a public announcement.",
+          "reflection": "Trusted adults can help quietly. You do not need to handle repeated bullying alone.",
+          "effects": {"mina_trust": 1, "scene_pressure": -2, "adult_loop": 2, "crew_energy": 0}
+        },
+        {
+          "id": "scroll_tray",
+          "label": "Focus on your tray and wait",
+          "approach": "do nothing",
+          "next": "wait_result",
+          "consequence": "The jokes fade when lunch ends, but Mina leaves early and skips adding her club sticker to the map.",
+          "reflection": "Waiting can avoid conflict, but repeated unkind behavior often needs support from peers or adults.",
+          "effects": {"mina_trust": -1, "scene_pressure": 1, "adult_loop": 0, "crew_energy": 0}
+        }
+      ]
+    },
+    "invite_result": {
+      "type": "story",
+      "speaker": "Narrator",
+      "text": "Mina picks silver stickers for the robot booth. She smiles a little when another student asks how the robot arm works.",
+      "choices": [{"id": "continue", "label": "Continue", "next": "showcase_setup"}]
+    },
+    "ask_adult_result": {
+      "type": "story",
+      "speaker": "Mina",
+      "text": "'Could you come with me?' Mina asks. Together, you tell the aide the facts without guessing why anyone acted that way.",
+      "choices": [{"id": "continue", "label": "Continue", "next": "showcase_setup"}]
+    },
+    "lunch_aide_result": {
+      "type": "story",
+      "speaker": "Narrator",
+      "text": "The aide moves nearby and invites Mina to help set up supplies. The teasing students switch topics when they notice an adult is paying attention.",
+      "choices": [{"id": "continue", "label": "Continue", "next": "showcase_setup"}]
+    },
+    "wait_result": {
+      "type": "story",
+      "speaker": "Narrator",
+      "text": "You still feel a tug in your stomach. You did not cause the problem, and you still have chances to help safely.",
+      "choices": [{"id": "continue", "label": "Continue", "next": "showcase_setup"}]
+    },
+    "showcase_setup": {
+      "type": "decision",
+      "decision_number": 3,
+      "speaker": "Narrator",
+      "text": "Before the showcase, Joss reaches for Mina's poster tube and says, 'Let's hide the robot so nobody has to see it.' This is more serious. Ms. Rivera is in the next room.",
+      "prompt": "What is the safest next step?",
+      "choices": [
+        {
+          "id": "adult_now",
+          "label": "Get Ms. Rivera right away",
+          "approach": "trusted adult",
+          "next": "adult_now_result",
+          "consequence": "You step away and tell Ms. Rivera the facts. She stops the poster grabbing, checks on Mina, and moves Joss to a different setup job.",
+          "reflection": "When someone may take or damage belongings, adult help is a safe and strong bystander action.",
+          "effects": {"mina_trust": 1, "scene_pressure": -3, "adult_loop": 2, "crew_energy": 0}
+        },
+        {
+          "id": "name_boundary",
+          "label": "Use a calm boundary and point to the rules",
+          "approach": "safe redirection",
+          "next": "boundary_result",
+          "consequence": "You say, 'Posters stay with their owners. The setup list says robot club goes here.' Your calm voice slows the moment, but an adult still notices the tension.",
+          "reflection": "A clear boundary can help when it stays safe. If the problem keeps going, bring in an adult.",
+          "effects": {"mina_trust": 1, "scene_pressure": -1, "adult_loop": 1, "crew_energy": 1}
+        },
+        {
+          "id": "stand_with_mina",
+          "label": "Stand beside Mina and ask what she wants",
+          "approach": "private support",
+          "next": "stand_result",
+          "consequence": "You move next to Mina and ask, 'Do you want me to get Ms. Rivera?' Mina says yes, and you go together.",
+          "reflection": "Standing with someone can be powerful, especially when it leads to safe adult support.",
+          "effects": {"mina_trust": 2, "scene_pressure": -2, "adult_loop": 2, "crew_energy": 0}
+        },
+        {
+          "id": "hope_stop",
+          "label": "Hope someone else handles it",
+          "approach": "do nothing",
+          "next": "hope_result",
+          "consequence": "Another student eventually calls Ms. Rivera. Mina gets her poster back, but she looks shaken and packs up early.",
+          "reflection": "It is never your fault when someone else is unkind. Still, hoping someone else acts can delay help.",
+          "effects": {"mina_trust": -1, "scene_pressure": 1, "adult_loop": 1, "crew_energy": 0}
+        }
+      ]
+    },
+    "adult_now_result": {
+      "type": "story",
+      "speaker": "Ms. Rivera",
+      "text": "'Thank you for telling me clearly,' Ms. Rivera says. 'Mina's project belongs here, and I will handle the rest.'",
+      "choices": [{"id": "continue", "label": "Continue", "next": "final_choice"}]
+    },
+    "boundary_result": {
+      "type": "story",
+      "speaker": "Narrator",
+      "text": "Joss lets go of the tube. Ms. Rivera arrives a moment later and asks you and Mina what happened so she can help safely.",
+      "choices": [{"id": "continue", "label": "Continue", "next": "final_choice"}]
+    },
+    "stand_result": {
+      "type": "story",
+      "speaker": "Narrator",
+      "text": "Walking together makes it easier for Mina to explain. Ms. Rivera thanks both of you and keeps the showcase calm.",
+      "choices": [{"id": "continue", "label": "Continue", "next": "final_choice"}]
+    },
+    "hope_result": {
+      "type": "story",
+      "speaker": "Narrator",
+      "text": "Ms. Rivera solves the poster problem, but Mina misses the first visitors. You can still repair and learn from the choice.",
+      "choices": [{"id": "continue", "label": "Continue", "next": "final_choice"}]
+    },
+    "final_choice": {
+      "type": "decision",
+      "decision_number": 4,
+      "speaker": "Narrator",
+      "text": "After school, Mina is putting the robot poster into her backpack. The showcase is over, but tomorrow's club meeting is still ahead.",
+      "prompt": "How do you close the day respectfully?",
+      "choices": [
+        {
+          "id": "check_in",
+          "label": "Check in and offer to sit together tomorrow",
+          "approach": "private support",
+          "next": "ending",
+          "consequence": "Mina says she would like that. She also says she wants an adult nearby for the first club meeting.",
+          "reflection": "Follow-up shows that support is not just one big moment; it can be steady and simple.",
+          "effects": {"mina_trust": 2, "scene_pressure": -1, "adult_loop": 1, "crew_energy": 1}
+        },
+        {
+          "id": "plan_with_adult",
+          "label": "Help make a plan with Ms. Rivera",
+          "approach": "trusted adult",
+          "next": "ending",
+          "consequence": "Ms. Rivera helps Mina choose where to sit tomorrow and says she will greet the club at the door.",
+          "reflection": "A trusted-adult plan can make tomorrow safer without blaming the person who was targeted.",
+          "effects": {"mina_trust": 1, "scene_pressure": -2, "adult_loop": 2, "crew_energy": 0}
+        },
+        {
+          "id": "positive_note",
+          "label": "Leave a kind note about the robot design",
+          "approach": "safe redirection",
+          "next": "ending",
+          "consequence": "Mina finds the note and adds one more gear drawing to the poster. It helps, though it does not replace adult support if the bullying returns.",
+          "reflection": "Kindness matters most when it is specific and respectful, not a demand to feel better.",
+          "effects": {"mina_trust": 1, "scene_pressure": -1, "adult_loop": 0, "crew_energy": 1}
+        },
+        {
+          "id": "head_home",
+          "label": "Head home without checking in",
+          "approach": "do nothing",
+          "next": "ending",
+          "consequence": "The day ends quietly. Mina is safe now, but you are not sure whether tomorrow will feel easier for her.",
+          "reflection": "Not every missed chance is forever. Replay to try a different support pattern.",
+          "effects": {"mina_trust": -1, "scene_pressure": 0, "adult_loop": 0, "crew_energy": 0}
+        }
+      ]
+    },
+    "ending": {
+      "type": "ending",
+      "speaker": "Reflection Board",
+      "text": "Your choices shaped the school day. No single choice makes you a perfect or bad bystander; practice helps you spot safe options.",
+      "choices": []
+    }
+  },
+  "ending_bands": [
+    {
+      "id": "supported_plan",
+      "condition": {"mina_trust_min": 4, "adult_loop_min": 3},
+      "title": "Steady Support Plan",
+      "summary": "Mina had peer support and a trusted-adult plan. The next club meeting starts with clearer safety and belonging.",
+      "prompt": "Which adult at school, home, or a program could you go to if a problem keeps happening?"
+    },
+    {
+      "id": "adult_anchor",
+      "condition": {"adult_loop_min": 3},
+      "title": "Adult Anchor",
+      "summary": "You used trusted adults to keep the situation safe. Adults handled the harmful behavior while Mina kept her dignity.",
+      "prompt": "How can you tell an adult the facts without blaming or guessing?"
+    },
+    {
+      "id": "peer_bridge",
+      "condition": {"mina_trust_min": 3, "adult_loop_min": 0},
+      "title": "Peer Bridge",
+      "summary": "Your choices helped Mina feel less alone. If the behavior repeats, adding a trusted adult could make the support stronger.",
+      "prompt": "What sign would tell you it is time to bring in an adult?"
+    },
+    {
+      "id": "try_again",
+      "condition": {},
+      "title": "Try Another Route",
+      "summary": "Some moments passed without much support. That can happen. Replaying lets you practice one small safe action at a time.",
+      "prompt": "Which one choice would you replay first: private support, adult help, or redirection?"
+    }
+  ]
+}
