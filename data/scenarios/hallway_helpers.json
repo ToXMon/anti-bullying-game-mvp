@@ -290,18 +290,18 @@
       "prompt": "Which adult at school, home, or a program could you go to if a problem keeps happening?"
     },
     {
-      "id": "peer_bridge",
-      "condition": {"mina_trust_min": 3, "adult_loop_min": 0},
-      "title": "Peer Bridge",
-      "summary": "Your choices helped Mina feel less alone. If the behavior repeats, adding a trusted adult could make the support stronger.",
-      "prompt": "What sign would tell you it is time to bring in an adult?"
-    },
-    {
       "id": "adult_anchor",
       "condition": {"adult_loop_min": 3},
       "title": "Adult Anchor",
       "summary": "You used trusted adults to keep the situation safe. Adults handled the harmful behavior while Mina kept her dignity.",
       "prompt": "How can you tell an adult the facts without blaming or guessing?"
+    },
+    {
+      "id": "peer_bridge",
+      "condition": {"mina_trust_min": 3, "adult_loop_min": 0},
+      "title": "Peer Bridge",
+      "summary": "Your choices helped Mina feel less alone. If the behavior repeats, adding a trusted adult could make the support stronger.",
+      "prompt": "What sign would tell you it is time to bring in an adult?"
     },
     {
       "id": "try_again",
