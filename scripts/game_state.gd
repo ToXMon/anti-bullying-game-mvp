@@ -52,7 +52,7 @@ func choose_ending_band(bands: Array) -> Dictionary:
 func _matches_condition(condition: Dictionary) -> bool:
 	for key in condition.keys():
 		if key.ends_with("_min"):
-			var score_key := key.trim_suffix("_min")
+			var score_key: String = key.trim_suffix("_min")
 			if int(scores.get(score_key, 0)) < int(condition[key]):
 				return false
 	return true

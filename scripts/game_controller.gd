@@ -3,19 +3,35 @@ extends Control
 const ContentRepositoryScript := preload("res://scripts/content_repository.gd")
 const GameStateScript := preload("res://scripts/game_state.gd")
 const SettingsStoreScript := preload("res://scripts/settings_store.gd")
+const StorybookBackdropScript := preload("res://scripts/storybook_backdrop.gd")
+const HallwayIllustrationScript := preload("res://scripts/hallway_illustration.gd")
+
+const INK := Color("#10202f")
+const MUTED_INK := Color("#4e5f68")
+const PAPER := Color("#fffaf0")
+const CARD := Color("#fff7e8")
+const CARD_ALT := Color("#eef8f6")
+const TEAL := Color("#4f8f99")
+const TEAL_DARK := Color("#276777")
 
 var repository = ContentRepositoryScript.new()
 var game_state = GameStateScript.new()
 var settings = SettingsStoreScript.new()
 var scenario: Dictionary = {}
 var active_node: Dictionary = {}
-var last_feedback := {"consequence": "", "reflection": ""}
+var last_feedback: Dictionary = {"consequence": "", "reflection": ""}
 var choice_buttons: Array[Button] = []
 
+var page_panel: PanelContainer
+var header_card: PanelContainer
+var story_card: PanelContainer
+var feedback_card: PanelContainer
+var choices_card: PanelContainer
+var hallway_art: Control
+var illustration: TextureRect
+var illustration_caption: Label
 var title_label: Label
 var progress_label: Label
-var illustration: TextureRect
-var missing_asset_label: Label
 var speaker_label: Label
 var story_label: RichTextLabel
 var prompt_label: Label
@@ -33,43 +49,61 @@ func _ready() -> void:
 	_load_game()
 
 func _build_ui() -> void:
-	var theme := Theme.new()
-	theme.default_font_size = 22
-	theme.set_color("font_color", "Label", Color("#10202f"))
-	theme.set_color("font_color", "Button", Color("#10202f"))
-	theme.set_font_size("font_size", "Button", 22)
-	theme.set_font_size("font_size", "Label", 22)
-	theme.set_font_size("normal_font_size", "RichTextLabel", 22)
-	self.theme = theme
+	self.theme = _make_storybook_theme()
 
-	var background := ColorRect.new()
-	background.color = Color("#f7fff7")
+	var background: Control = StorybookBackdropScript.new()
 	background.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(background)
 
-	var margin := MarginContainer.new()
+	var margin: MarginContainer = MarginContainer.new()
 	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
-	margin.add_theme_constant_override("margin_left", 28)
-	margin.add_theme_constant_override("margin_right", 28)
-	margin.add_theme_constant_override("margin_top", 20)
-	margin.add_theme_constant_override("margin_bottom", 20)
+	margin.add_theme_constant_override("margin_left", 34)
+	margin.add_theme_constant_override("margin_right", 34)
+	margin.add_theme_constant_override("margin_top", 24)
+	margin.add_theme_constant_override("margin_bottom", 24)
 	add_child(margin)
 
-	var root := VBoxContainer.new()
-	root.add_theme_constant_override("separation", 14)
-	margin.add_child(root)
+	page_panel = PanelContainer.new()
+	page_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	page_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	page_panel.add_theme_stylebox_override("panel", _make_panel_style(PAPER, Color("#e1b783"), 28, 2, Color("#7b5633", 0.18), 14))
+	margin.add_child(page_panel)
 
-	var header := HBoxContainer.new()
-	header.add_theme_constant_override("separation", 10)
-	root.add_child(header)
+	var root: VBoxContainer = VBoxContainer.new()
+	root.add_theme_constant_override("separation", 16)
+	root.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	root.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	page_panel.add_child(root)
+
+	header_card = PanelContainer.new()
+	header_card.add_theme_stylebox_override("panel", _make_panel_style(Color("#fff1d5"), Color("#e4b36d"), 22, 2, Color("#8a5d2c", 0.10), 6))
+	root.add_child(header_card)
+
+	var header: HBoxContainer = HBoxContainer.new()
+	header.add_theme_constant_override("separation", 12)
+	header_card.add_child(header)
+
+	var title_stack: VBoxContainer = VBoxContainer.new()
+	title_stack.add_theme_constant_override("separation", 2)
+	title_stack.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	header.add_child(title_stack)
 
 	title_label = Label.new()
 	title_label.text = "Kindness Crew"
 	title_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	title_label.add_theme_font_size_override("font_size", 30)
-	header.add_child(title_label)
+	title_label.add_theme_font_size_override("font_size", 34)
+	title_label.add_theme_color_override("font_color", Color("#284451"))
+	title_stack.add_child(title_label)
+
+	progress_label = Label.new()
+	progress_label.text = "No timer. Use mouse, touch, Enter, or number keys 1-4."
+	progress_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	progress_label.add_theme_font_size_override("font_size", 18)
+	progress_label.add_theme_color_override("font_color", MUTED_INK)
+	title_stack.add_child(progress_label)
 
 	adult_button = _make_small_button("Trusted adult help")
+	_apply_adult_button_style(adult_button)
 	adult_button.pressed.connect(_show_adult_help)
 	header.add_child(adult_button)
 
@@ -81,34 +115,56 @@ func _build_ui() -> void:
 	replay_button.pressed.connect(_restart)
 	header.add_child(replay_button)
 
-	progress_label = Label.new()
-	progress_label.text = "No timer. Use mouse, touch, Enter, or number keys 1-4."
-	progress_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	root.add_child(progress_label)
+	var scene_frame: PanelContainer = PanelContainer.new()
+	scene_frame.add_theme_stylebox_override("panel", _make_panel_style(Color("#ffe8c6"), Color("#d99a66"), 24, 2, Color("#8a5d2c", 0.13), 8))
+	root.add_child(scene_frame)
+
+	var scene_stack: VBoxContainer = VBoxContainer.new()
+	scene_stack.add_theme_constant_override("separation", 8)
+	scene_frame.add_child(scene_stack)
+
+	hallway_art = HallwayIllustrationScript.new()
+	hallway_art.custom_minimum_size = Vector2(0, 180)
+	hallway_art.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scene_stack.add_child(hallway_art)
 
 	illustration = TextureRect.new()
-	illustration.custom_minimum_size = Vector2(0, 110)
+	illustration.custom_minimum_size = Vector2(0, 150)
 	illustration.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
 	illustration.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	root.add_child(illustration)
+	illustration.visible = false
+	scene_stack.add_child(illustration)
 
-	missing_asset_label = Label.new()
-	missing_asset_label.text = "Text-only mode: optional illustration not found."
-	missing_asset_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	root.add_child(missing_asset_label)
+	illustration_caption = Label.new()
+	illustration_caption.text = "A calm illustrated hallway with a visible trusted-adult doorway."
+	illustration_caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	illustration_caption.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	illustration_caption.add_theme_font_size_override("font_size", 17)
+	illustration_caption.add_theme_color_override("font_color", MUTED_INK)
+	scene_stack.add_child(illustration_caption)
 
-	var scroll := ScrollContainer.new()
+	var scroll: ScrollContainer = ScrollContainer.new()
+	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	root.add_child(scroll)
 
-	var content := VBoxContainer.new()
-	content.add_theme_constant_override("separation", 12)
+	var content: VBoxContainer = VBoxContainer.new()
+	content.add_theme_constant_override("separation", 14)
 	content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll.add_child(content)
 
+	story_card = PanelContainer.new()
+	story_card.add_theme_stylebox_override("panel", _make_panel_style(CARD, Color("#dfb172"), 22, 2, Color("#8a5d2c", 0.11), 8))
+	content.add_child(story_card)
+
+	var story_stack: VBoxContainer = VBoxContainer.new()
+	story_stack.add_theme_constant_override("separation", 8)
+	story_card.add_child(story_stack)
+
 	speaker_label = Label.new()
-	speaker_label.add_theme_font_size_override("font_size", 24)
-	content.add_child(speaker_label)
+	speaker_label.add_theme_font_size_override("font_size", 25)
+	speaker_label.add_theme_color_override("font_color", Color("#6c4b35"))
+	story_stack.add_child(speaker_label)
 
 	story_label = RichTextLabel.new()
 	story_label.fit_content = true
@@ -116,35 +172,104 @@ func _build_ui() -> void:
 	story_label.scroll_active = false
 	story_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	story_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	content.add_child(story_label)
+	story_label.add_theme_color_override("default_color", INK)
+	story_stack.add_child(story_label)
+
+	feedback_card = PanelContainer.new()
+	feedback_card.add_theme_stylebox_override("panel", _make_panel_style(CARD_ALT, Color("#9fc5bd"), 20, 2, Color("#3d6b70", 0.08), 6))
+	content.add_child(feedback_card)
 
 	feedback_label = RichTextLabel.new()
 	feedback_label.fit_content = true
 	feedback_label.bbcode_enabled = false
 	feedback_label.scroll_active = false
 	feedback_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	feedback_label.add_theme_color_override("default_color", Color("#10202f"))
-	content.add_child(feedback_label)
+	feedback_label.add_theme_color_override("default_color", INK)
+	feedback_card.add_child(feedback_label)
+
+	choices_card = PanelContainer.new()
+	choices_card.add_theme_stylebox_override("panel", _make_panel_style(Color("#fffdf7"), Color("#ead2a5"), 22, 2, Color("#8a5d2c", 0.08), 6))
+	content.add_child(choices_card)
+
+	var choices_stack: VBoxContainer = VBoxContainer.new()
+	choices_stack.add_theme_constant_override("separation", 12)
+	choices_card.add_child(choices_stack)
 
 	prompt_label = Label.new()
 	prompt_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	prompt_label.add_theme_font_size_override("font_size", 24)
-	content.add_child(prompt_label)
+	prompt_label.add_theme_font_size_override("font_size", 25)
+	prompt_label.add_theme_color_override("font_color", Color("#284451"))
+	choices_stack.add_child(prompt_label)
 
 	choices_box = VBoxContainer.new()
-	choices_box.add_theme_constant_override("separation", 10)
-	content.add_child(choices_box)
+	choices_box.add_theme_constant_override("separation", 12)
+	choices_stack.add_child(choices_box)
 
 	adult_dialog = AcceptDialog.new()
 	adult_dialog.title = "Trusted adult path"
 	adult_dialog.dialog_text = "If someone is being targeted, you can tell a trusted adult the facts: who was there, what happened, where it happened, and what help is needed now. In this game, adult-help choices are always available and never punish the person being targeted."
+	adult_dialog.add_theme_stylebox_override("panel", _make_panel_style(PAPER, TEAL, 22, 2, Color("#284451", 0.16), 10))
 	add_child(adult_dialog)
 
+func _make_storybook_theme() -> Theme:
+	var theme: Theme = Theme.new()
+	theme.default_font_size = 22
+	theme.set_color("font_color", "Label", INK)
+	theme.set_color("font_color", "Button", INK)
+	theme.set_color("font_hover_color", "Button", INK)
+	theme.set_color("font_pressed_color", "Button", Color("#152936"))
+	theme.set_color("font_focus_color", "Button", Color("#152936"))
+	theme.set_color("default_color", "RichTextLabel", INK)
+	theme.set_font_size("font_size", "Button", 22)
+	theme.set_font_size("font_size", "Label", 22)
+	theme.set_font_size("normal_font_size", "RichTextLabel", 22)
+	theme.set_stylebox("normal", "Button", _make_button_style(Color("#fff5df"), Color("#d79a62")))
+	theme.set_stylebox("hover", "Button", _make_button_style(Color("#ffe9bd"), Color("#c47f48")))
+	theme.set_stylebox("pressed", "Button", _make_button_style(Color("#f5d49b"), Color("#a96435")))
+	theme.set_stylebox("focus", "Button", _make_button_style(Color("#fff5df"), TEAL_DARK, 4))
+	return theme
+
+func _make_panel_style(fill: Color, border: Color, radius: int, border_width: int, shadow: Color, shadow_size: int) -> StyleBoxFlat:
+	var style: StyleBoxFlat = StyleBoxFlat.new()
+	style.bg_color = fill
+	style.border_color = border
+	style.set_corner_radius_all(radius)
+	style.set_border_width_all(border_width)
+	style.shadow_color = shadow
+	style.shadow_size = shadow_size
+	style.shadow_offset = Vector2(0, 4)
+	style.content_margin_left = 20.0
+	style.content_margin_right = 20.0
+	style.content_margin_top = 16.0
+	style.content_margin_bottom = 16.0
+	return style
+
+func _make_button_style(fill: Color, border: Color, border_width: int = 2) -> StyleBoxFlat:
+	var style: StyleBoxFlat = StyleBoxFlat.new()
+	style.bg_color = fill
+	style.border_color = border
+	style.set_corner_radius_all(18)
+	style.set_border_width_all(border_width)
+	style.shadow_color = Color("#7b5633", 0.10)
+	style.shadow_size = 4
+	style.shadow_offset = Vector2(0, 2)
+	style.content_margin_left = 18.0
+	style.content_margin_right = 18.0
+	style.content_margin_top = 12.0
+	style.content_margin_bottom = 12.0
+	return style
+
 func _make_small_button(text: String) -> Button:
-	var button := Button.new()
+	var button: Button = Button.new()
 	button.text = text
-	button.custom_minimum_size = Vector2(130, 48)
+	button.custom_minimum_size = Vector2(140, 52)
 	return button
+
+func _apply_adult_button_style(button: Button) -> void:
+	button.add_theme_stylebox_override("normal", _make_button_style(Color("#e8f6f4"), TEAL))
+	button.add_theme_stylebox_override("hover", _make_button_style(Color("#d7efeb"), TEAL_DARK))
+	button.add_theme_stylebox_override("pressed", _make_button_style(Color("#c4e4df"), TEAL_DARK))
+	button.add_theme_stylebox_override("focus", _make_button_style(Color("#e8f6f4"), Color("#174c5a"), 4))
 
 func _load_game() -> void:
 	scenario = repository.load_scenario()
@@ -162,10 +287,12 @@ func _load_optional_illustration(path: String) -> void:
 	if path != "" and ResourceLoader.exists(path):
 		illustration.texture = load(path)
 		illustration.visible = true
-		missing_asset_label.visible = false
+		hallway_art.visible = false
+		illustration_caption.text = "Project-local illustration loaded. The trusted-adult path remains available."
 	else:
 		illustration.visible = false
-		missing_asset_label.visible = true
+		hallway_art.visible = true
+		illustration_caption.text = "Original procedural hallway art keeps the scene calm without external assets."
 
 func _show_load_error() -> void:
 	speaker_label.text = "Project setup"
@@ -194,18 +321,32 @@ func _render_current_node() -> void:
 
 	for index in range(active_node.get("choices", []).size()):
 		var choice: Dictionary = active_node["choices"][index]
-		var button := Button.new()
+		var button: Button = Button.new()
 		button.text = "%d. %s" % [index + 1, choice.get("label", "Continue")]
-		button.custom_minimum_size = Vector2(0, 64)
+		button.custom_minimum_size = Vector2(0, 72)
 		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		button.tooltip_text = choice.get("approach", "continue")
+		_style_choice_button(button, choice.get("approach", ""))
 		button.pressed.connect(_on_choice_pressed.bind(choice))
 		choices_box.add_child(button)
 		choice_buttons.append(button)
 
 	if not choice_buttons.is_empty():
 		choice_buttons[0].grab_focus()
+
+func _style_choice_button(button: Button, approach: String) -> void:
+	if approach == "trusted adult":
+		_apply_adult_button_style(button)
+	elif approach == "private support":
+		button.add_theme_stylebox_override("normal", _make_button_style(Color("#f3edf8"), Color("#b399c9")))
+		button.add_theme_stylebox_override("hover", _make_button_style(Color("#eadff2"), Color("#9477b0")))
+	elif approach == "safe redirection":
+		button.add_theme_stylebox_override("normal", _make_button_style(Color("#eef7e7"), Color("#95b86f")))
+		button.add_theme_stylebox_override("hover", _make_button_style(Color("#e2f0d7"), Color("#789b55")))
+	elif approach == "do nothing":
+		button.add_theme_stylebox_override("normal", _make_button_style(Color("#f5f0e8"), Color("#b8a897")))
+		button.add_theme_stylebox_override("hover", _make_button_style(Color("#ece5dc"), Color("#958575")))
 
 func _format_feedback() -> String:
 	var consequence: String = last_feedback.get("consequence", "")
@@ -215,8 +356,8 @@ func _format_feedback() -> String:
 	return "What happened: %s\nReflection: %s" % [consequence, reflection]
 
 func _update_progress() -> void:
-	var decisions := game_state.decision_count()
-	var adult_status := "adult path tried" if game_state.has_trusted_adult_path() else "adult path available"
+	var decisions: int = game_state.decision_count()
+	var adult_status: String = "adult path tried" if game_state.has_trusted_adult_path() else "adult path available"
 	progress_label.text = "Decision practice: %d of 4 • %s • no timer • number keys 1-4 work" % [decisions, adult_status]
 
 func _on_choice_pressed(choice: Dictionary) -> void:
@@ -225,14 +366,18 @@ func _on_choice_pressed(choice: Dictionary) -> void:
 		"reflection": choice.get("reflection", "")
 	}
 	game_state.apply_choice(game_state.current_node_id, choice)
-	if not settings.reduced_motion:
-		modulate = Color("#f1f7ff")
-		var tween := create_tween()
-		tween.tween_property(self, "modulate", Color.WHITE, 0.18)
 	_render_current_node()
+	_play_scene_transition()
+
+func _play_scene_transition() -> void:
+	if settings.reduced_motion:
+		return
+	page_panel.modulate = Color("#fff4df")
+	var tween: Tween = create_tween()
+	tween.tween_property(page_panel, "modulate", Color.WHITE, 0.18)
 
 func _render_ending() -> void:
-	var band := game_state.choose_ending_band(scenario.get("ending_bands", []))
+	var band: Dictionary = game_state.choose_ending_band(scenario.get("ending_bands", []))
 	var lines: Array[String] = []
 	lines.append(active_node.get("text", ""))
 	lines.append("")
@@ -252,9 +397,9 @@ func _render_ending() -> void:
 	prompt_label.text = "Replay or review the trusted-adult path."
 	feedback_label.text = _format_feedback()
 
-	var replay := Button.new()
+	var replay: Button = Button.new()
 	replay.text = "Replay a different route"
-	replay.custom_minimum_size = Vector2(0, 68)
+	replay.custom_minimum_size = Vector2(0, 72)
 	replay.pressed.connect(_restart)
 	choices_box.add_child(replay)
 	choice_buttons.append(replay)
@@ -272,6 +417,7 @@ func _restart() -> void:
 	game_state.reset(scenario.get("start_node", "intro"))
 	last_feedback = {"consequence": scenario.get("safety_note", ""), "reflection": "Try a new pattern: private support, trusted adult, safe redirection, or noticing what happens when no one acts."}
 	_render_current_node()
+	_play_scene_transition()
 
 func _toggle_reduced_motion() -> void:
 	settings.reduced_motion = not settings.reduced_motion
@@ -280,13 +426,13 @@ func _toggle_reduced_motion() -> void:
 	motion_button.text = "Reduced motion: %s" % ["On" if settings.reduced_motion else "Off"]
 
 func _show_adult_help() -> void:
-	adult_dialog.popup_centered(Vector2i(560, 260))
+	adult_dialog.popup_centered(Vector2i(620, 300))
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo:
-		var key_event := event as InputEventKey
+		var key_event: InputEventKey = event as InputEventKey
 		if key_event.keycode >= KEY_1 and key_event.keycode <= KEY_4:
-			var index := key_event.keycode - KEY_1
+			var index: int = key_event.keycode - KEY_1
 			if index >= 0 and index < choice_buttons.size():
 				choice_buttons[index].emit_signal("pressed")
 		elif key_event.keycode == KEY_R:
