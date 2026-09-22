@@ -5,6 +5,7 @@ const GameStateScript := preload("res://scripts/game_state.gd")
 const SettingsStoreScript := preload("res://scripts/settings_store.gd")
 const StorybookBackdropScript := preload("res://scripts/storybook_backdrop.gd")
 const HallwayIllustrationScript := preload("res://scripts/hallway_illustration.gd")
+const CinematicHallwayWorldScript := preload("res://scripts/cinematic_hallway_world.gd")
 
 const INK := Color("#10202f")
 const MUTED_INK := Color("#4e5f68")
@@ -28,10 +29,14 @@ var story_card: PanelContainer
 var feedback_card: PanelContainer
 var choices_card: PanelContainer
 var hallway_art: Control
+var cinematic_world
 var illustration: TextureRect
 var illustration_caption: Label
 var title_label: Label
+var chapter_label: Label
+var safety_label: Label
 var progress_label: Label
+var progress_meter: ProgressBar
 var speaker_label: Label
 var story_label: RichTextLabel
 var prompt_label: Label
@@ -39,6 +44,7 @@ var feedback_label: RichTextLabel
 var choices_box: VBoxContainer
 var replay_button: Button
 var motion_button: Button
+var quality_button: Button
 var adult_button: Button
 var adult_dialog: AcceptDialog
 
@@ -102,6 +108,16 @@ func _build_ui() -> void:
 	progress_label.add_theme_color_override("font_color", MUTED_INK)
 	title_stack.add_child(progress_label)
 
+	progress_meter = ProgressBar.new()
+	progress_meter.min_value = 0.0
+	progress_meter.max_value = 4.0
+	progress_meter.value = 0.0
+	progress_meter.show_percentage = false
+	progress_meter.custom_minimum_size = Vector2(0, 12)
+	progress_meter.add_theme_stylebox_override("background", _make_progress_style(Color("#f6dfb7")))
+	progress_meter.add_theme_stylebox_override("fill", _make_progress_style(Color("#5f9eae")))
+	title_stack.add_child(progress_meter)
+
 	adult_button = _make_small_button("Trusted adult help")
 	_apply_adult_button_style(adult_button)
 	adult_button.pressed.connect(_show_adult_help)
@@ -110,6 +126,10 @@ func _build_ui() -> void:
 	motion_button = _make_small_button("Reduced motion: Off")
 	motion_button.pressed.connect(_toggle_reduced_motion)
 	header.add_child(motion_button)
+
+	quality_button = _make_small_button("3D detail: Full")
+	quality_button.pressed.connect(_toggle_visual_quality)
+	header.add_child(quality_button)
 
 	replay_button = _make_small_button("Replay")
 	replay_button.pressed.connect(_restart)
@@ -120,11 +140,37 @@ func _build_ui() -> void:
 	root.add_child(scene_frame)
 
 	var scene_stack: VBoxContainer = VBoxContainer.new()
-	scene_stack.add_theme_constant_override("separation", 8)
+	scene_stack.add_theme_constant_override("separation", 10)
 	scene_frame.add_child(scene_stack)
 
+	var chapter_strip: HBoxContainer = HBoxContainer.new()
+	chapter_strip.add_theme_constant_override("separation", 10)
+	scene_stack.add_child(chapter_strip)
+
+	chapter_label = Label.new()
+	chapter_label.text = "Prologue • Maple Commons"
+	chapter_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	chapter_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	chapter_label.add_theme_font_size_override("font_size", 22)
+	chapter_label.add_theme_color_override("font_color", Color("#284451"))
+	chapter_strip.add_child(chapter_label)
+
+	safety_label = Label.new()
+	safety_label.text = "Private practice • no public scores"
+	safety_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	safety_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	safety_label.add_theme_font_size_override("font_size", 16)
+	safety_label.add_theme_color_override("font_color", MUTED_INK)
+	chapter_strip.add_child(safety_label)
+
+	if _can_use_3d_presentation():
+		cinematic_world = CinematicHallwayWorldScript.new()
+		cinematic_world.custom_minimum_size = Vector2(0, 240)
+		cinematic_world.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		scene_stack.add_child(cinematic_world)
+
 	hallway_art = HallwayIllustrationScript.new()
-	hallway_art.custom_minimum_size = Vector2(0, 180)
+	hallway_art.custom_minimum_size = Vector2(0, 200)
 	hallway_art.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scene_stack.add_child(hallway_art)
 
@@ -244,6 +290,16 @@ func _make_panel_style(fill: Color, border: Color, radius: int, border_width: in
 	style.content_margin_bottom = 16.0
 	return style
 
+func _make_progress_style(fill: Color) -> StyleBoxFlat:
+	var style: StyleBoxFlat = StyleBoxFlat.new()
+	style.bg_color = fill
+	style.set_corner_radius_all(8)
+	style.content_margin_left = 0.0
+	style.content_margin_right = 0.0
+	style.content_margin_top = 0.0
+	style.content_margin_bottom = 0.0
+	return style
+
 func _make_button_style(fill: Color, border: Color, border_width: int = 2) -> StyleBoxFlat:
 	var style: StyleBoxFlat = StyleBoxFlat.new()
 	style.bg_color = fill
@@ -263,6 +319,7 @@ func _make_small_button(text: String) -> Button:
 	var button: Button = Button.new()
 	button.text = text
 	button.custom_minimum_size = Vector2(140, 52)
+	button.focus_mode = Control.FOCUS_ALL
 	return button
 
 func _apply_adult_button_style(button: Button) -> void:
@@ -284,15 +341,58 @@ func _load_game() -> void:
 	_render_current_node()
 
 func _load_optional_illustration(path: String) -> void:
-	if path != "" and ResourceLoader.exists(path):
+	var has_optional_illustration: bool = path != "" and ResourceLoader.exists(path)
+	if has_optional_illustration:
 		illustration.texture = load(path)
 		illustration.visible = true
+		if cinematic_world != null:
+			cinematic_world.visible = false
 		hallway_art.visible = false
 		illustration_caption.text = "Project-local illustration loaded. The trusted-adult path remains available."
+	elif cinematic_world != null:
+		illustration.visible = false
+		cinematic_world.visible = true
+		hallway_art.visible = false
+		illustration_caption.text = "Original procedural 3D hallway art uses project-authored Godot meshes and no external assets."
 	else:
 		illustration.visible = false
+		if cinematic_world != null:
+			cinematic_world.visible = false
 		hallway_art.visible = true
-		illustration_caption.text = "Original procedural hallway art keeps the scene calm without external assets."
+		illustration_caption.text = "Original procedural 2D hallway fallback keeps the scene readable when 3D rendering is unavailable."
+	_sync_visual_controls()
+
+func _can_use_3d_presentation() -> bool:
+	return DisplayServer.get_name().to_lower() != "headless"
+
+func _sync_visual_controls() -> void:
+	if quality_button == null:
+		return
+	if cinematic_world == null or not cinematic_world.visible:
+		quality_button.text = "Visuals: 2D fallback"
+		quality_button.disabled = true
+		return
+	quality_button.disabled = false
+	quality_button.text = "3D detail: %s" % ["Low" if settings.visual_quality == "calm" else "Full"]
+
+func _update_scene_presentation() -> void:
+	var fallback_title: String = _fallback_chapter_title()
+	chapter_label.text = fallback_title
+	safety_label.text = "Private practice • no public scores"
+	if cinematic_world != null and cinematic_world.visible:
+		cinematic_world.set_context(game_state.current_node_id, active_node, settings.reduced_motion, settings.visual_quality)
+		chapter_label.text = cinematic_world.get_chapter_title()
+		illustration_caption.text = cinematic_world.get_caption_text()
+	elif hallway_art != null and hallway_art.visible:
+		illustration_caption.text = "Original procedural 2D hallway fallback keeps the scene readable when 3D rendering is unavailable."
+
+func _fallback_chapter_title() -> String:
+	if active_node.get("type", "story") == "ending":
+		return "Reflection Board • Replay Ready"
+	var decision_number: int = int(active_node.get("decision_number", max(0, game_state.decision_count())))
+	if decision_number <= 0:
+		return "Prologue • Maple Commons"
+	return "Chapter %d • Bystander practice" % decision_number
 
 func _show_load_error() -> void:
 	speaker_label.text = "Project setup"
@@ -314,6 +414,8 @@ func _render_current_node() -> void:
 	feedback_label.text = _format_feedback()
 	_update_progress()
 	motion_button.text = "Reduced motion: %s" % ["On" if settings.reduced_motion else "Off"]
+	_sync_visual_controls()
+	_update_scene_presentation()
 
 	if active_node.get("type", "story") == "ending":
 		_render_ending()
@@ -341,12 +443,18 @@ func _style_choice_button(button: Button, approach: String) -> void:
 	elif approach == "private support":
 		button.add_theme_stylebox_override("normal", _make_button_style(Color("#f3edf8"), Color("#b399c9")))
 		button.add_theme_stylebox_override("hover", _make_button_style(Color("#eadff2"), Color("#9477b0")))
+		button.add_theme_stylebox_override("pressed", _make_button_style(Color("#ddcfe9"), Color("#7b5fa0")))
+		button.add_theme_stylebox_override("focus", _make_button_style(Color("#f3edf8"), Color("#5b3f80"), 4))
 	elif approach == "safe redirection":
 		button.add_theme_stylebox_override("normal", _make_button_style(Color("#eef7e7"), Color("#95b86f")))
 		button.add_theme_stylebox_override("hover", _make_button_style(Color("#e2f0d7"), Color("#789b55")))
+		button.add_theme_stylebox_override("pressed", _make_button_style(Color("#d1e7bd"), Color("#5e7f3e")))
+		button.add_theme_stylebox_override("focus", _make_button_style(Color("#eef7e7"), Color("#3f6f2c"), 4))
 	elif approach == "do nothing":
 		button.add_theme_stylebox_override("normal", _make_button_style(Color("#f5f0e8"), Color("#b8a897")))
 		button.add_theme_stylebox_override("hover", _make_button_style(Color("#ece5dc"), Color("#958575")))
+		button.add_theme_stylebox_override("pressed", _make_button_style(Color("#ded4c8"), Color("#77685a")))
+		button.add_theme_stylebox_override("focus", _make_button_style(Color("#f5f0e8"), Color("#5e5146"), 4))
 
 func _format_feedback() -> String:
 	var consequence: String = last_feedback.get("consequence", "")
@@ -359,6 +467,8 @@ func _update_progress() -> void:
 	var decisions: int = game_state.decision_count()
 	var adult_status: String = "adult path tried" if game_state.has_trusted_adult_path() else "adult path available"
 	progress_label.text = "Decision practice: %d of 4 • %s • no timer • number keys 1-4 work" % [decisions, adult_status]
+	if progress_meter != null:
+		progress_meter.value = float(decisions)
 
 func _on_choice_pressed(choice: Dictionary) -> void:
 	last_feedback = {
@@ -424,6 +534,13 @@ func _toggle_reduced_motion() -> void:
 	game_state.reduced_motion = settings.reduced_motion
 	settings.save_settings()
 	motion_button.text = "Reduced motion: %s" % ["On" if settings.reduced_motion else "Off"]
+	_update_scene_presentation()
+
+func _toggle_visual_quality() -> void:
+	settings.visual_quality = "calm" if settings.visual_quality != "calm" else "cinematic"
+	settings.save_settings()
+	_sync_visual_controls()
+	_update_scene_presentation()
 
 func _show_adult_help() -> void:
 	adult_dialog.popup_centered(Vector2i(620, 300))
