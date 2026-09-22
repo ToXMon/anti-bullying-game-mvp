@@ -82,6 +82,11 @@ const TRUSTED_ADULT := Color("#4d99a7")
 const MINA := Color("#a987d6")
 const FRIEND := Color("#78b96a")
 const CLASSMATE := Color("#f0a35f")
+const CORAL := Color("#f28a66")
+const SUN_YELLOW := Color("#f7cf68")
+const MINT := Color("#9edec6")
+const SKY_BLUE := Color("#9ed8f2")
+const NAVY := Color("#2b5870")
 
 var viewport: SubViewport
 var scene_root: Node3D
@@ -153,6 +158,20 @@ func get_caption_text() -> String:
 		suffix = " Low-detail mode keeps the same route and hides extra playful props for slower laptops."
 	return "%s%s" % [chapter.get("caption", "Original procedural 3D school commons."), suffix]
 
+func get_visual_asset_summary() -> Dictionary:
+	if scene_root == null:
+		return {"mesh_count": 0, "visible_mesh_count": 0, "landmark_sign_count": 0}
+	var meshes := scene_root.find_children("*", "MeshInstance3D", true, false)
+	var visible_mesh_count := 0
+	for mesh in meshes:
+		if mesh.is_visible_in_tree():
+			visible_mesh_count += 1
+	return {
+		"mesh_count": meshes.size(),
+		"visible_mesh_count": visible_mesh_count,
+		"landmark_sign_count": scene_root.find_children("*", "Label3D", true, false).size(),
+	}
+
 func _build_viewport() -> void:
 	viewport = SubViewport.new()
 	viewport.disable_3d = false
@@ -207,6 +226,7 @@ func _build_world() -> void:
 
 	_build_architecture()
 	_build_safe_route()
+	_build_signature_spaces()
 	_build_props()
 	_build_characters()
 	_apply_camera(CHAPTERS["welcome"]["camera"], CHAPTERS["welcome"]["target"])
@@ -241,6 +261,54 @@ func _build_architecture() -> void:
 	_add_box("trusted adult doorway", Vector3(7.94, 1.72, -8.7), Vector3(0.42, 3.15, 1.95), _mat(Color("#87cfc3"), 0.82))
 	_add_box("trusted adult welcome window", Vector3(7.60, 2.56, -8.7), Vector3(0.08, 0.55, 1.20), _mat(Color("#ecfffb", 0.90), 0.55, true))
 	_add_box("trusted adult welcome mat", Vector3(6.72, 0.04, -8.7), Vector3(1.15, 0.045, 1.04), _mat(Color("#d8f5ee"), 0.90))
+
+func _build_signature_spaces() -> void:
+	# Distinctive, original landmarks make the commons readable as a friendly toy-like system.
+	_add_box("welcome arch left", Vector3(-2.70, 1.65, -1.05), Vector3(0.34, 3.30, 0.46), _mat(MINT, 0.78))
+	_add_box("welcome arch right", Vector3(2.70, 1.65, -1.05), Vector3(0.34, 3.30, 0.46), _mat(MINT, 0.78))
+	_add_box("welcome arch top", Vector3(0.0, 3.20, -1.05), Vector3(5.72, 0.34, 0.46), _mat(CORAL, 0.78))
+	var sun := _add_cylinder("welcome arch sun", Vector3(0.0, 2.60, -0.76), 0.42, 0.10, _mat(SUN_YELLOW, 0.76, true))
+	sun.rotation_degrees.x = 90.0
+	_add_label("MAPLE COMMONS", Vector3(0.0, 3.62, -0.70), PAPER, 48)
+
+	# Maker classroom: a small robot mascot gives the space a memorable silhouette.
+	_add_box("maker lab sign plate", Vector3(-7.72, 3.05, 0.65), Vector3(0.08, 0.52, 1.78), _mat(SKY_BLUE, 0.72))
+	_add_label("CLASS LAB", Vector3(-7.55, 3.04, 0.65), NAVY, 30)
+	_add_box("maker robot body", Vector3(-6.92, 0.70, 0.48), Vector3(0.68, 0.76, 0.52), _mat(SKY_BLUE, 0.70))
+	_add_box("maker robot head", Vector3(-6.92, 1.42, 0.48), Vector3(0.56, 0.42, 0.46), _mat(PAPER, 0.74))
+	for x in [-0.12, 0.12]:
+		_add_sphere("maker robot eye", Vector3(-6.92 + x, 1.46, 0.73), 0.055, _mat(NAVY, 0.70, true))
+	_add_cylinder("maker robot antenna", Vector3(-6.92, 1.83, 0.48), 0.035, 0.30, _mat(CORAL, 0.72))
+	_add_sphere("maker robot antenna light", Vector3(-6.92, 2.01, 0.48), 0.075, _mat(SUN_YELLOW, 0.66, true))
+
+	# Lunch club: a colorful canopy and fruit cart read from the far side of the commons.
+	_add_cylinder("lunch canopy pole", Vector3(6.18, 1.42, -3.72), 0.045, 2.55, _mat(NAVY, 0.78))
+	var canopy := _add_cylinder("lunch canopy", Vector3(6.18, 2.78, -3.72), 1.02, 0.34, _mat(CORAL, 0.76))
+	(canopy.mesh as CylinderMesh).top_radius = 0.08
+	(canopy.mesh as CylinderMesh).bottom_radius = 1.02
+	_add_box("lunch cart", Vector3(6.18, 0.52, -3.72), Vector3(1.35, 0.72, 0.72), _mat(MINT, 0.80))
+	for i in range(3):
+		_add_sphere("lunch fruit display", Vector3(5.78 + float(i) * 0.38, 0.96, -3.95), 0.13, _mat(_note_color(i + 2), 0.72))
+	_add_label("LUNCH CLUB", Vector3(6.18, 3.30, -3.55), NAVY, 30)
+
+	# Recess garden: soft tree shapes and a ball signal an open, optional reset space.
+	_add_cylinder("recess tree trunk", Vector3(-6.92, 1.05, -6.95), 0.16, 1.55, _mat(Color("#b98059"), 0.88))
+	for offset in [Vector3(-0.38, 1.90, 0.0), Vector3(0.0, 2.12, 0.0), Vector3(0.38, 1.90, 0.0)]:
+		_add_sphere("recess tree canopy", Vector3(-6.92, 0.0, -6.95) + offset, 0.48, _mat(Color("#86c978"), 0.86))
+	_add_sphere("recess play ball", Vector3(-6.20, 0.34, -6.55), 0.25, _mat(SUN_YELLOW, 0.70))
+	_add_label("RECESS GARDEN", Vector3(-7.55, 3.18, -6.95), NAVY, 28)
+
+	# Trusted-adult landmark: a welcoming arch, plant, and high-contrast sign make help obvious.
+	_add_box("adult help arch left", Vector3(6.72, 2.00, -8.72), Vector3(0.20, 3.72, 0.34), _mat(TRUSTED_ADULT, 0.72))
+	_add_box("adult help arch right", Vector3(8.08, 2.00, -8.72), Vector3(0.20, 3.72, 0.34), _mat(TRUSTED_ADULT, 0.72))
+	_add_box("adult help arch top", Vector3(7.40, 3.76, -8.72), Vector3(1.56, 0.20, 0.34), _mat(MINT, 0.72))
+	_add_label("HELP IS HERE", Vector3(7.40, 4.20, -8.48), NAVY, 34)
+	_add_box("adult welcome sign", Vector3(7.40, 2.72, -8.46), Vector3(0.06, 0.42, 0.74), _mat(PAPER, 0.62, true))
+	_add_sphere("adult welcome heart left", Vector3(7.28, 2.82, -8.40), 0.12, _mat(CORAL, 0.70, true))
+	_add_sphere("adult welcome heart right", Vector3(7.52, 2.82, -8.40), 0.12, _mat(CORAL, 0.70, true))
+	_add_cylinder("adult welcome plant", Vector3(8.72, 0.43, -8.72), 0.30, 0.45, _mat(Color("#e8b66e"), 0.88))
+	for offset in [Vector3(-0.20, 0.44, 0.0), Vector3(0.0, 0.62, 0.0), Vector3(0.20, 0.44, 0.0)]:
+		_add_sphere("adult plant leaf", Vector3(8.72, 0.0, -8.72) + offset, 0.20, _mat(Color("#78bf83"), 0.84))
 
 func _build_safe_route() -> void:
 	for i in range(8):
@@ -341,6 +409,8 @@ func _make_avatar(origin: Vector3, body_color: Color, scale: float, avatar_name:
 	var avatar := Node3D.new()
 	avatar.name = avatar_name
 	scene_root.add_child(avatar)
+	var is_adult := avatar_name.contains("adult") or avatar_name.contains("Ms ")
+	var accessory_color := TRUSTED_ADULT if is_adult else body_color.lightened(0.16)
 	var torso := _mesh_instance(CapsuleMesh.new(), _mat(body_color, 0.82))
 	(torso.mesh as CapsuleMesh).radius = 0.18 * scale
 	(torso.mesh as CapsuleMesh).height = 0.78 * scale
@@ -356,13 +426,35 @@ func _make_avatar(origin: Vector3, body_color: Color, scale: float, avatar_name:
 	(hair.mesh as SphereMesh).height = 0.22 * scale
 	hair.position = origin + Vector3(0.0, 1.42 * scale, -0.015)
 	avatar.add_child(hair)
+	var backpack := _mesh_instance(BoxMesh.new(), _mat(accessory_color.darkened(0.12), 0.86))
+	(backpack.mesh as BoxMesh).size = Vector3(0.30, 0.48, 0.16) * scale
+	backpack.position = origin + Vector3(0.0, 0.78 * scale, -0.22 * scale)
+	avatar.add_child(backpack)
+	var collar := _mesh_instance(CylinderMesh.new(), _mat(accessory_color, 0.74))
+	(collar.mesh as CylinderMesh).top_radius = 0.16 * scale
+	(collar.mesh as CylinderMesh).bottom_radius = 0.19 * scale
+	(collar.mesh as CylinderMesh).height = 0.09 * scale
+	collar.position = origin + Vector3(0.0, 1.02 * scale, 0.0)
+	avatar.add_child(collar)
 	for x in [-0.07, 0.07]:
 		var eye := _mesh_instance(SphereMesh.new(), _mat(INK, 0.92))
 		(eye.mesh as SphereMesh).radius = 0.025 * scale
 		(eye.mesh as SphereMesh).height = 0.05 * scale
-		eye.name = "friendly eye"
+		eye.name = "expressive friendly eye"
 		eye.position = origin + Vector3(x * scale, 1.34 * scale, 0.18 * scale)
 		avatar.add_child(eye)
+	for x in [-0.09, 0.09]:
+		var cheek := _mesh_instance(SphereMesh.new(), _mat(CORAL, 0.92, true))
+		(cheek.mesh as SphereMesh).radius = 0.035 * scale
+		(cheek.mesh as SphereMesh).height = 0.07 * scale
+		cheek.position = origin + Vector3(x * scale, 1.24 * scale, 0.185 * scale)
+		cheek.name = "friendly cheek"
+		avatar.add_child(cheek)
+	var smile := _mesh_instance(BoxMesh.new(), _mat(NAVY, 0.90, true))
+	(smile.mesh as BoxMesh).size = Vector3(0.10, 0.022, 0.018) * scale
+	smile.position = origin + Vector3(0.0, 1.22 * scale, 0.195 * scale)
+	smile.name = "friendly smile"
+	avatar.add_child(smile)
 	for x in [-0.12, 0.12]:
 		var leg := _mesh_instance(CapsuleMesh.new(), _mat(Color("#4d5f68"), 0.88))
 		(leg.mesh as CapsuleMesh).radius = 0.055 * scale
@@ -374,8 +466,23 @@ func _make_avatar(origin: Vector3, body_color: Color, scale: float, avatar_name:
 		(arm.mesh as CapsuleMesh).radius = 0.045 * scale
 		(arm.mesh as CapsuleMesh).height = 0.44 * scale
 		arm.position = origin + Vector3(x * scale, 0.84 * scale, 0.0)
-		arm.rotation_degrees.z = 10.0 * signf(x)
+		arm.rotation_degrees.z = (16.0 if is_adult else 10.0) * signf(x)
 		avatar.add_child(arm)
+	var cap := _mesh_instance(CylinderMesh.new(), _mat(accessory_color, 0.76))
+	(cap.mesh as CylinderMesh).top_radius = 0.15 * scale
+	(cap.mesh as CylinderMesh).bottom_radius = 0.23 * scale
+	(cap.mesh as CylinderMesh).height = 0.10 * scale
+	cap.position = origin + Vector3(0.0, 1.56 * scale, 0.0)
+	cap.name = "expressive avatar cap"
+	avatar.add_child(cap)
+	var badge := _mesh_instance(CylinderMesh.new(), _mat(SUN_YELLOW if not is_adult else PAPER, 0.62, true))
+	(badge.mesh as CylinderMesh).top_radius = 0.075 * scale
+	(badge.mesh as CylinderMesh).bottom_radius = 0.075 * scale
+	(badge.mesh as CylinderMesh).height = 0.025 * scale
+	badge.rotation_degrees.x = 90.0
+	badge.position = origin + Vector3(0.0, 0.91 * scale, 0.215 * scale)
+	badge.name = "adult help badge" if is_adult else "kindness badge"
+	avatar.add_child(badge)
 	return avatar
 
 func _register(node: Node3D, key: String) -> void:
@@ -396,6 +503,7 @@ func _update_accent(accent: Color, sky_color: Color) -> void:
 			var mat := node.get_surface_override_material(0) as StandardMaterial3D
 			if mat != null:
 				mat.albedo_color = accent.lightened(0.18)
+				mat.emission_enabled = true
 				mat.emission = accent
 	if environment != null:
 		environment.background_color = sky_color
@@ -449,6 +557,19 @@ func _quad(node_name: String, position: Vector3, size: Vector2, color: Color) ->
 	node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	scene_root.add_child(node)
 	return node
+
+func _add_label(text: String, position: Vector3, color: Color, font_size: int) -> Label3D:
+	var label := Label3D.new()
+	label.name = "landmark sign %s" % text
+	label.text = text
+	label.position = position
+	label.font_size = font_size
+	label.modulate = color
+	label.outline_size = 8
+	label.outline_modulate = Color("#fffdf2")
+	label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	scene_root.add_child(label)
+	return label
 
 func _mesh_instance(mesh: Mesh, material: StandardMaterial3D) -> MeshInstance3D:
 	var node := MeshInstance3D.new()

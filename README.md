@@ -7,6 +7,7 @@
 - One 8-12 minute scenario with 4 decision points.
 - Distinct, non-shaming consequences and short reflections after each choice.
 - Replay from the ending or the header.
+- A polished procedural 3D school commons with signature landmarks, expressive toy-like avatars, and readable support routes.
 - Clear trusted-adult path available from both choices and the help button.
 - No combat, graphic imagery, public chat, ads, accounts, tracking, therapy claims, diagnostic claims, or child-submitted personal stories.
 - No personal data is stored. Analytics are off by default; local persistence is limited to accessibility/privacy settings in `user://settings.cfg` (reduced motion and visual-quality toggles).
@@ -41,7 +42,7 @@ Content, state, presentation, and persistence are intentionally separated:
 - `scripts/game_state.gd` — in-memory route and score state; no personal data or route history is saved.
 - `scripts/settings_store.gd` — local accessibility/privacy settings only; analytics remains off by default.
 - `scripts/game_controller.gd` — UI presentation, keyboard/touch controls, replay, optional asset handling, and trusted-adult help.
-- `scripts/playful_school_world.gd` — original procedural 3D school-world presentation, chapter camera framing, soft daylight, quality toggle, trusted-adult route cues, and 2D/headless fallback coordination.
+- `scripts/playful_school_world.gd` — original procedural 3D school-world presentation, signature landmark assets, expressive avatar silhouettes, chapter camera framing, soft daylight, quality toggle, trusted-adult route cues, and 2D/headless fallback coordination.
 - `scenes/main.tscn` — Godot entry scene.
 - `tests/test_scenario_contract.py` — focused automated checks for the scenario contract and reachable endings.
 - `tests/test_visual_contract.py` — focused automated checks for procedural visual provenance, fallback, accessibility controls, and chapter presentation.
@@ -52,11 +53,11 @@ Content, state, presentation, and persistence are intentionally separated:
 
 This visual pass uses original project-authored procedural Godot meshes, materials, lights, and UI styles. The Kage and ThreeUI repositories were used only as reference studies for composition, readable depth, chapter framing, component hierarchy, spacing, and stateful controls; no code, artwork, branding, assets, or text from those projects is copied. No third-party art, textures, fonts, GLB files, analytics SDKs, or network services are included.
 
-The 3D scene keeps runtime practical by using simple primitive meshes, one active chapter prop set at a time, three lights, no physics, no particles, and no binary assets. Full detail is roughly under 110 active mesh draws on the busiest chapter; **World detail: Low** hides extra playful props and skylight panels, lowers 3D render scale, and disables MSAA. New asset payload is script text only; added binary asset size is 0 bytes.
+The 3D scene keeps runtime practical by using simple primitive meshes, one active chapter prop set at a time, three lights, no physics, no particles, and no binary assets. Full detail is roughly under 170 active mesh draws on the busiest chapter; **World detail: Low** hides extra playful props and skylight panels, lowers 3D render scale, and disables MSAA. New asset payload is script text only; added binary asset size is 0 bytes.
 
 ## Visual revision rationale
 
-Before: the branch leaned on dramatic depth treatment and film-style wording that did not fit a warm practice space for ages 8-12. After: the world is a daytime school commons with classroom, lunch, recess, and trusted-adult landmarks, toy-like avatars, playful props, and safe route tiles that make adult help visible without pressure.
+Before: the branch leaned on generic primitive props and broad hallway framing that made the social spaces feel interchangeable. After: the world has an original visual vocabulary—Maple Commons entry arch, maker robot, Lunch Club canopy, Recess Garden, expressive avatars, and a high-contrast HELP IS HERE landmark—while safe route tiles make adult help visible without pressure.
 
 ## Automated tests
 
@@ -79,7 +80,7 @@ godot4 --headless --path . --script tests/godot_interactive_smoke.gd
 Use this checklist before a school pilot or moderated parent test:
 
 1. Launch the project in Godot 4.x and confirm the title screen text appears.
-2. Confirm the bright procedural 3D school world appears when no optional illustration asset exists, or the procedural 2D fallback appears when 3D is unavailable.
+2. Confirm the bright procedural 3D school world appears with the Maple Commons arch, colorful chapter landmarks, expressive avatars, and HELP IS HERE route cue when no optional illustration asset exists, or the procedural 2D fallback appears when 3D is unavailable.
 3. Play one route using only touch/mouse; verify all buttons are large and readable.
 4. Replay and play one route using number keys `1`-`4`.
 5. Choose at least one **trusted adult** option and confirm the progress line changes to "adult path tried".

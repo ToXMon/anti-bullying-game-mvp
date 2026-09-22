@@ -78,7 +78,14 @@ class VisualContractTests(unittest.TestCase):
             "recess garden window",
             "safe route tile",
             "trusted adult doorway",
-            "friendly avatar",
+            "welcome arch",
+            "maker robot",
+            "lunch canopy",
+            "recess tree canopy",
+            "adult help arch",
+            "expressive friendly eye",
+            "adult help badge",
+            "func get_visual_asset_summary",
         ):
             self.assertIn(landmark, self.world)
         self.assertIn("no public scores", self.controller)
@@ -91,6 +98,8 @@ class VisualContractTests(unittest.TestCase):
         self.assertIn("adult path available", self.controller)
         self.assertIn("trusted adult welcome", self.world)
         self.assertIn("safe route", self.world)
+        self.assertIn('"HELP IS HERE"', self.world)
+        self.assertIn('"RECESS GARDEN"', self.world)
 
     def test_large_targets_keyboard_and_quality_controls_remain_present(self):
         self.assertIn("button.custom_minimum_size = Vector2(0, 72)", self.controller)
