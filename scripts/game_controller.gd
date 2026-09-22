@@ -61,6 +61,14 @@ func _build_ui() -> void:
 	background.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(background)
 
+	if _can_use_3d_presentation():
+		cinematic_world = CinematicHallwayWorldScript.new()
+		cinematic_world.set_anchors_preset(Control.PRESET_FULL_RECT)
+		cinematic_world.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		cinematic_world.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		cinematic_world.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		add_child(cinematic_world)
+
 	var margin: MarginContainer = MarginContainer.new()
 	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
 	margin.add_theme_constant_override("margin_left", 34)
@@ -72,7 +80,7 @@ func _build_ui() -> void:
 	page_panel = PanelContainer.new()
 	page_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	page_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	page_panel.add_theme_stylebox_override("panel", _make_panel_style(PAPER, Color("#e1b783"), 28, 2, Color("#7b5633", 0.18), 14))
+	page_panel.add_theme_stylebox_override("panel", _make_panel_style(Color("#fffaf0", 0.82), Color("#e1b783", 0.88), 28, 2, Color("#7b5633", 0.20), 16))
 	margin.add_child(page_panel)
 
 	var root: VBoxContainer = VBoxContainer.new()
@@ -82,7 +90,7 @@ func _build_ui() -> void:
 	page_panel.add_child(root)
 
 	header_card = PanelContainer.new()
-	header_card.add_theme_stylebox_override("panel", _make_panel_style(Color("#fff1d5"), Color("#e4b36d"), 22, 2, Color("#8a5d2c", 0.10), 6))
+	header_card.add_theme_stylebox_override("panel", _make_panel_style(Color("#fff1d5", 0.93), Color("#e4b36d"), 22, 2, Color("#8a5d2c", 0.10), 6))
 	root.add_child(header_card)
 
 	var header: HBoxContainer = HBoxContainer.new()
@@ -162,12 +170,6 @@ func _build_ui() -> void:
 	safety_label.add_theme_font_size_override("font_size", 16)
 	safety_label.add_theme_color_override("font_color", MUTED_INK)
 	chapter_strip.add_child(safety_label)
-
-	if _can_use_3d_presentation():
-		cinematic_world = CinematicHallwayWorldScript.new()
-		cinematic_world.custom_minimum_size = Vector2(0, 240)
-		cinematic_world.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		scene_stack.add_child(cinematic_world)
 
 	hallway_art = HallwayIllustrationScript.new()
 	hallway_art.custom_minimum_size = Vector2(0, 200)

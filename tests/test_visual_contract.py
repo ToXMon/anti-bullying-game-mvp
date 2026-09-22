@@ -28,11 +28,15 @@ class VisualContractTests(unittest.TestCase):
         self.assertIn("BoxMesh.new()", self.cinematic)
         self.assertIn("SphereMesh.new()", self.cinematic)
         self.assertIn("CapsuleMesh.new()", self.cinematic)
+        self.assertIn("TorusMesh.new()", self.cinematic)
+        self.assertIn("_make_robot_model", self.cinematic)
+        self.assertIn("_make_layered_locker", self.cinematic)
         self.assertIn("draw_", self.backdrop)
         self.assertIn("draw_", self.illustration)
 
     def test_missing_optional_art_uses_3d_or_2d_fallback(self):
         self.assertIn("ResourceLoader.exists(path)", self.controller)
+        self.assertIn("cinematic_world.set_anchors_preset(Control.PRESET_FULL_RECT)", self.controller)
         self.assertIn("cinematic_world.visible = true", self.controller)
         self.assertIn("hallway_art.visible = true", self.controller)
         self.assertIn("Original procedural 3D hallway art", self.controller)
@@ -55,6 +59,8 @@ class VisualContractTests(unittest.TestCase):
         ):
             self.assertIn(label, self.cinematic)
         self.assertIn("trusted adult doorway", self.cinematic)
+        self.assertIn("layered kindness bulletin board", self.cinematic)
+        self.assertIn("showcase robot table", self.cinematic)
         self.assertIn("no public scores", self.controller)
         self.assertIn("No timer", self.controller)
 

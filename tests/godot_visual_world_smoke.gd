@@ -28,10 +28,15 @@ func _run() -> void:
 	for context in contexts:
 		world.set_context(context, {}, true, "cinematic")
 		await process_frame
+		var metrics: Dictionary = world.get_world_metrics()
 		_expect(world.get_chapter_title() != "", "chapter title exists for %s" % context)
 		_expect(world.get_caption_text() != "", "caption exists for %s" % context)
+		_expect(int(metrics.get("mesh_instances", 0)) >= 190, "world has a substantial procedural mesh library for %s" % context)
+		_expect(int(metrics.get("visible_mesh_instances", 0)) >= 45, "active chapter exposes visible 3D objects for %s" % context)
 	world.set_visual_quality("calm")
+	var calm_metrics: Dictionary = world.get_world_metrics()
 	_expect(world.get_caption_text().find("Low-detail") >= 0, "low-detail caption documents quality mode")
+	_expect(int(calm_metrics.get("detail_nodes", 0)) >= 20, "quality toggle manages decorative detail nodes")
 	_finish()
 
 func _expect(condition: bool, message: String) -> void:

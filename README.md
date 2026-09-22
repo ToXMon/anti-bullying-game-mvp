@@ -21,7 +21,7 @@
    Some systems install the binary as `godot` instead of `godot4`.
 3. Press **Play**. The main scene is `res://scenes/main.tscn`.
 
-The project is resilient to missing optional art or 3D rendering: if `res://assets/hallway_helpers.png` is absent, the game uses an original procedural Godot 3D hallway; if 3D is unavailable (for example in headless mode), it falls back to the original procedural storybook hallway drawn with Godot controls and draw calls.
+The project is resilient to missing optional art or 3D rendering: if `res://assets/hallway_helpers.png` is absent, the game uses an original full-screen procedural Godot 3D school hallway behind the scenario UI; if 3D is unavailable (for example in headless mode), it falls back to the original procedural storybook hallway drawn with Godot controls and draw calls.
 
 ## Controls
 
@@ -41,7 +41,7 @@ Content, state, presentation, and persistence are intentionally separated:
 - `scripts/game_state.gd` — in-memory route and score state; no personal data or route history is saved.
 - `scripts/settings_store.gd` — local accessibility/privacy settings only; analytics remains off by default.
 - `scripts/game_controller.gd` — UI presentation, keyboard/touch controls, replay, optional asset handling, and trusted-adult help.
-- `scripts/cinematic_hallway_world.gd` — original procedural 3D hallway presentation, chapter camera framing, lighting, fog, quality toggle, and 2D/headless fallback coordination.
+- `scripts/cinematic_hallway_world.gd` — original full-screen procedural 3D school-world presentation, chapter camera framing, lighting, fog, quality toggle, object library, and 2D/headless fallback coordination.
 - `scenes/main.tscn` — Godot entry scene.
 - `tests/test_scenario_contract.py` — focused automated checks for the scenario contract and reachable endings.
 - `tests/test_visual_contract.py` — focused automated checks for procedural visual provenance, fallback, accessibility controls, and chapter presentation.
@@ -52,7 +52,7 @@ Content, state, presentation, and persistence are intentionally separated:
 
 This visual pass uses original project-authored procedural Godot meshes, materials, lights, and UI styles. The Kage and ThreeUI repositories were used only as reference studies for cinematic camera language, layered depth, restrained atmosphere, chapter framing, component hierarchy, spacing, and stateful controls; no code, artwork, branding, assets, or text from those projects is copied. No third-party art, textures, fonts, GLB files, analytics SDKs, or network services are included.
 
-The 3D scene keeps runtime practical by using simple primitive meshes, one active chapter prop set at a time, three lights, no physics, no particles, and no binary assets. Full detail is roughly under 95 active mesh draws on the busiest chapter; **3D detail: Low** hides decorative haze/light patches, lowers 3D render scale, and disables MSAA. New asset payload is script text only; added binary asset size is 0 bytes.
+The 3D scene keeps runtime practical by using primitive mesh construction rather than imported binaries: layered lockers with vents and name plates, bulletin-board papers and pins, glass display cases, lunch tables with trays, robot showcase models with gear rings, trusted-adult doorway details, backpacks, benches, friendly non-photoreal avatars, ceiling lights, haze cards, and chapter floor emblems. A smoke test asserts a procedural mesh library of at least 190 mesh instances with at least 45 visible per chapter while only one chapter prop set is active. **3D detail: Low** hides decorative haze/light shafts/floor flourishes, lowers 3D render scale, and disables MSAA. New asset payload is script text only; added binary asset size is 0 bytes.
 
 ## Automated tests
 
@@ -75,7 +75,7 @@ godot4 --headless --path . --script tests/godot_interactive_smoke.gd
 Use this checklist before a school pilot or moderated parent test:
 
 1. Launch the project in Godot 4.x and confirm the title screen text appears.
-2. Confirm the cinematic procedural 3D hallway appears when no optional illustration asset exists, or the procedural 2D fallback appears when 3D is unavailable.
+2. Confirm the full-screen cinematic procedural 3D hallway appears behind the scenario UI when no optional illustration asset exists, or the procedural 2D fallback appears when 3D is unavailable.
 3. Play one route using only touch/mouse; verify all buttons are large and readable.
 4. Replay and play one route using number keys `1`-`4`.
 5. Choose at least one **trusted adult** option and confirm the progress line changes to "adult path tried".
