@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=1920, height=1080">
+  <title>Small Brave Things — a question for families</title>
+  <script src="assets/gsap.min.js"></script>
+  <style>
+    @font-face{font-family:DM;src:url(assets/dm-sans-400.ttf)}
+    @font-face{font-family:DM;src:url(assets/dm-sans-700.ttf);font-weight:700}
+    @font-face{font-family:Fraunces;src:url(assets/fraunces-600.ttf);font-weight:600}
+    *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden}
+    #root{position:relative;width:100%;height:100%;overflow:hidden;background:#f7f4ed;color:#172328;font-family:DM,sans-serif}
+    .clip{position:absolute;inset:0;overflow:hidden}.inner{position:absolute;inset:0;padding:115px 155px;display:flex;flex-direction:column;justify-content:center}
+    .kicker{font:700 24px DM,sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#2348cf;margin:0 0 42px}
+    h1,h2,h3,p{margin:0}h1,h2,h3{font-family:Fraunces,serif;font-weight:600;letter-spacing:-.045em;line-height:1.08}
+    h1{font-size:114px;max-width:1570px}h2{font-size:86px;max-width:1370px}h3{font-size:54px}p{font-size:33px;line-height:1.42}
+    em{font-style:normal;color:#2d5bff}.under{display:inline-block;border-bottom:13px solid #d8f36a;padding-bottom:5px}
+    .dots{display:flex;gap:19px;margin-top:70px}.dots i{display:block;width:44px;height:44px;border-radius:13px;background:#2d5bff;transform:rotate(-8deg)}.dots i:nth-child(2){background:#d8f36a;transform:rotate(6deg)}.dots i:nth-child(3){background:#ff735f;transform:rotate(-4deg)}
+    .panel{display:grid;grid-template-columns:650px 1fr;gap:100px;align-items:center}.scene-card{border:19px solid #2d5bff;border-radius:45px;background:#fffdf8;box-shadow:0 28px 60px #17232818;overflow:hidden}.scene-top{padding:27px 35px;border-bottom:2px solid #dfe1d9;font-size:21px;font-weight:700;letter-spacing:.04em}.scene-art{background:#e9ecff;height:260px;display:grid;place-items:center}.tiles{display:flex;gap:14px}.tiles span{display:grid;place-items:center;width:130px;height:130px;border-radius:28px;background:white;font-size:23px;font-weight:700;transform:rotate(-4deg)}.tiles span:nth-child(2){background:#d8f36a;transform:translateY(-19px)}.tiles span:nth-child(3){background:#ff735f;transform:translateY(7px)}.scene-copy{padding:35px}.scene-copy h3{font-size:42px;margin-bottom:28px}.option{padding:21px 25px;margin:13px 0;border:2px solid #dfe1d9;border-radius:15px;background:#f4f2ea;font-size:24px;font-weight:700}.option.on{background:#d8f36a;border-color:#172328}.explain{max-width:790px}.explain h2{font-size:76px}.explain p{margin-top:35px;color:#405158}
+    .age-list{display:flex;gap:29px;margin-top:65px}.age-card{width:500px;min-height:350px;background:#fffdf8;border:2px solid #dfe1d9;border-radius:34px;padding:34px 38px;display:flex;flex-direction:column;justify-content:space-between}.age-card:nth-child(2){background:#eeedff}.age-card:nth-child(3){background:#e5eee9}.age-card strong{display:block;font-size:24px;letter-spacing:.06em}.age-card h3{font-size:50px}.age-card small{font-size:21px;font-weight:700;color:#405158}
+    .teen-frame{display:flex;align-items:center;gap:100px}.teen-card{background:#e5eee9;border-radius:40px;padding:66px;width:670px;min-height:450px;display:flex;flex-direction:column;justify-content:space-between}.teen-card strong{font-size:29px}.teen-card h3{font-size:75px}.teen-card small{font:700 24px DM,sans-serif}.teen-frame h2{max-width:800px}
+    .outro{background:#172328;color:white}.outro .kicker{color:#d8f36a}.outro h1{font-size:132px}.outro p{color:#f7f4ed;margin-top:56px;font-weight:700}.outro .mark{width:98px;height:98px;border-radius:28px;background:#2d5bff;display:grid;place-items:center;font-size:75px;margin-bottom:48px;transform:rotate(-7deg)}
+    .disclaimer{font:700 20px DM,sans-serif;color:#405158;position:absolute;bottom:55px;left:155px}.outro .disclaimer{color:#dce3ff}
+  </style>
+</head>
+<body>
+  <div data-hf-id="hf-onjd" id="root" data-composition-id="main" data-start="0" data-duration="21" data-width="1920" data-height="1080" data-fps="30">
+    <section data-hf-id="hf-2lrh" class="clip" id="opening" data-start="0" data-duration="3" data-track-index="0"><div data-hf-id="hf-lm34" class="inner"><p data-hf-id="hf-z51a" class="kicker" id="open-kicker">A QUESTION FOR FAMILIES</p><h1 data-hf-id="hf-74dv" id="open-head">When a moment gets hard,<br data-hf-id="hf-x5px"><em data-hf-id="hf-3276" class="under">what comes next?</em></h1><div data-hf-id="hf-oksg" class="dots" id="open-dots" aria-hidden="true"><i data-hf-id="hf-wt6k"></i><i data-hf-id="hf-zeb8"></i><i data-hf-id="hf-y7e5"></i></div></div></section>
+    <section data-hf-id="hf-0pn9" class="clip" id="example" data-start="3" data-duration="4" data-track-index="0"><div data-hf-id="hf-28cq" class="inner panel"><div data-hf-id="hf-7xd6" class="scene-card" id="scene-card"><div data-hf-id="hf-5i2y" class="scene-top">ILLUSTRATIVE SCENE / THE LUNCH TABLE</div><div data-hf-id="hf-ahd0" class="scene-art"><div data-hf-id="hf-hovr" class="tiles"><span data-hf-id="hf-flf5">pause</span><span data-hf-id="hf-0ka5">notice</span><span data-hf-id="hf-nyfo">choose</span></div></div><div data-hf-id="hf-bney" class="scene-copy"><h3 data-hf-id="hf-188x">You notice someone go quiet.</h3><div data-hf-id="hf-pl9x" class="option" id="first-option">Check in quietly</div><div data-hf-id="hf-kds8" class="option" id="second-option">Ask an adult for backup</div></div></div><div data-hf-id="hf-g4iz" class="explain" id="example-copy"><p data-hf-id="hf-d0oj" class="kicker">NOT A RIGHT-ANSWER TEST</p><h2 data-hf-id="hf-21m1">A chance to consider a <em data-hf-id="hf-pbj1">safer next step.</em></h2><p data-hf-id="hf-n546">Fictional choices. Room to pause and try again.</p></div><span data-hf-id="hf-609j" class="disclaimer">Illustrative 8–12 example · not teen-validated gameplay</span></div></section>
+    <section data-hf-id="hf-qmn8" class="clip" id="age-directions" data-start="7" data-duration="5" data-track-index="0"><div data-hf-id="hf-bug8" class="inner"><p data-hf-id="hf-rayw" class="kicker" id="ages-kicker">DIFFERENT AGES · DIFFERENT SITUATIONS</p><h2 data-hf-id="hf-z3vt" id="ages-head">Not one game stretched to fit everyone.</h2><div data-hf-id="hf-ctai" class="age-list"><div data-hf-id="hf-vcwx" class="age-card" id="age-a"><strong data-hf-id="hf-uceu">AGES 8–9</strong><h3 data-hf-id="hf-wo3q">Find a first step.</h3><small data-hf-id="hf-la5b">Proposed direction</small></div><div data-hf-id="hf-zb0y" class="age-card" id="age-b"><strong data-hf-id="hf-8dyf">AGES 10–12</strong><h3 data-hf-id="hf-0fzh">Try another path.</h3><small data-hf-id="hf-ijip">Prototype age range · still being tested</small></div><div data-hf-id="hf-394z" class="age-card" id="age-c"><strong data-hf-id="hf-p8y1">AGES 13–15</strong><h3 data-hf-id="hf-c3jh">Not childish.</h3><small data-hf-id="hf-hbu7">Research question · no teen-ready prototype</small></div></div></div></section>
+    <section data-hf-id="hf-a4zn" class="clip" id="teen-direction" data-start="12" data-duration="4" data-track-index="0"><div data-hf-id="hf-05e8" class="inner teen-frame"><div data-hf-id="hf-rqp4" class="teen-card" id="teen-card"><strong data-hf-id="hf-g97f">AGES 13–15 / AN OPEN QUESTION</strong><h3 data-hf-id="hf-3atg">What would feel real to a teen?</h3><small data-hf-id="hf-vzvw">More nuance. More autonomy. A different visual language.</small></div><h2 data-hf-id="hf-so3p" id="teen-head">For teens, <em data-hf-id="hf-crgu">we’re listening first.</em></h2><span data-hf-id="hf-okhf" class="disclaimer">Research question · no teen-ready prototype</span></div></section>
+    <section data-hf-id="hf-xuyc" class="clip outro" id="closing" data-start="16" data-duration="5" data-track-index="0"><div data-hf-id="hf-anj5" class="inner"><div data-hf-id="hf-neef" class="mark" id="brand-mark" aria-hidden="true">✦</div><p data-hf-id="hf-omkg" class="kicker" id="end-kicker">EXPLORING PRACTICE FOR AGES 8–15</p><h1 data-hf-id="hf-73tz" id="end-head">Small Brave Things.</h1><p data-hf-id="hf-5dpw" id="end-cta">Parents &amp; caregivers: share your perspective.</p><span data-hf-id="hf-o0du" class="disclaimer">Current prototypes: ages 8–12 · Teen fit is still being explored</span></div></section>
+    <audio data-hf-id="hf-pk9z" id="music" src="assets/score.wav" data-start="0" data-duration="21" data-track-index="1" data-volume="0.45"></audio>
+  </div>
+  <script>
+    const tl=gsap.timeline({paused:true});
+    tl.from('#open-kicker',{y:20,opacity:0,duration:.45,ease:'power2.out'},.12)
+      .from('#open-head',{y:55,opacity:0,duration:.75,ease:'power3.out'},.45)
+      .from('#open-dots i',{y:50,opacity:0,stagger:.15,duration:.45,ease:'power2.out'},1.35)
+      .from('#scene-card',{y:65,opacity:0,duration:.55,ease:'power3.out'},3.12)
+      .from('#example-copy',{y:35,opacity:0,duration:.55,ease:'power2.out'},3.32)
+      .to('#first-option',{backgroundColor:'#d8f36a',borderColor:'#172328',duration:.22},4.5)
+      .to('#first-option',{backgroundColor:'#f4f2ea',borderColor:'#dfe1d9',duration:.22},5.32)
+      .to('#second-option',{backgroundColor:'#d8f36a',borderColor:'#172328',duration:.22},5.57)
+      .from('#ages-kicker',{y:20,opacity:0,duration:.35},7.05)
+      .from('#ages-head',{y:35,opacity:0,duration:.55},7.22)
+      .from('#age-a',{y:55,opacity:0,duration:.55,ease:'power2.out'},8.05)
+      .from('#age-b',{y:55,opacity:0,duration:.55,ease:'power2.out'},8.7)
+      .from('#age-c',{y:55,opacity:0,duration:.55,ease:'power2.out'},9.35)
+      .from('#teen-card',{y:55,opacity:0,duration:.65},12.2)
+      .from('#teen-head',{y:35,opacity:0,duration:.65},12.65)
+      .from('#brand-mark',{y:30,opacity:0,duration:.45},16.1)
+      .from('#end-kicker',{y:20,opacity:0,duration:.4},16.42)
+      .from('#end-head',{y:45,opacity:0,duration:.65},16.7)
+      .from('#end-cta',{y:22,opacity:0,duration:.55},17.35);
+    window.__timelines['main']=tl;
+  </script>
+</body>
+</html>
